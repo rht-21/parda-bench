@@ -1,0 +1,11 @@
+id = "basic-anthropic-pan"
+category = "basic"
+description = "One PAN through the Anthropic messages API."
+api = "anthropic_messages"
+stream = false
+pii = ["ABCPS1234K"]
+checks = ["no_leak_upstream", "restored_exact", "no_placeholder_fragment"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "PAN " }, { slot = 0 }, { text = " for my ITR filing." }] }
+reply = { kind = "text", chunks = [[{ text = "PAN " }, { slot = 0 }, { text = " is linked to your return." }]] }

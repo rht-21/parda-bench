@@ -1,0 +1,11 @@
+id = "split-anthropic-two-chunks"
+category = "streaming_split"
+description = "A placeholder split across two Anthropic text deltas."
+api = "anthropic_messages"
+stream = true
+pii = ["2345 6789 0124"]
+checks = ["no_leak_upstream", "restored_exact", "no_placeholder_fragment"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "Aadhaar " }, { slot = 0 }, { text = " needs an address update." }] }
+reply = { kind = "text", chunks = [[{ text = "Aadhaar " }, { slot = 0, to = 5 }], [{ slot = 0, from = 5 }, { text = " will be updated." }]] }

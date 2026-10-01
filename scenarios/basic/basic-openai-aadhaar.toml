@@ -1,0 +1,11 @@
+id = "basic-openai-aadhaar"
+category = "basic"
+description = "One Aadhaar number in a user message, echoed back once."
+api = "openai_chat"
+stream = false
+pii = ["2345 6789 0124"]
+checks = ["no_leak_upstream", "restored_exact", "no_placeholder_fragment"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "My Aadhaar is " }, { slot = 0 }, { text = ". Please verify it." }] }
+reply = { kind = "text", chunks = [[{ text = "I have noted Aadhaar " }, { slot = 0 }, { text = "." }]] }

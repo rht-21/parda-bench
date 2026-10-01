@@ -1,0 +1,16 @@
+id = "tools-anthropic-roundtrip"
+category = "tool_calls"
+description = "Tool call with a masked phone number, then a tool result carrying new personal data, then a final answer."
+api = "anthropic_messages"
+stream = false
+pii = ["+91 98765 43210", "Ananya Iyer", "SBIN0001234"]
+checks = ["no_leak_upstream", "restored_exact", "json_valid", "placeholder_stable_across_turns", "no_placeholder_fragment"]
+tools = [{ name = "lookup_account", description = "Find the bank account linked to a mobile number.", parameters = { type = "object", properties = { phone = { type = "string" } }, required = ["phone"] } }]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "Whose account is linked to " }, { slot = 0 }, { text = "?" }] }
+reply = { kind = "tool_call", call_id = "toolu_1", name = "lookup_account", argument_chunks = [[{ text = '{"phone": "' }, { slot = 0 }, { text = '"}' }]] }
+
+[[turns]]
+input = { kind = "tool_result", call_id = "toolu_1", content = [{ text = "Account holder " }, { slot = 1 }, { text = ", IFSC " }, { slot = 2 }, { text = "." }] }
+reply = { kind = "text", chunks = [[{ text = "The account belongs to " }, { slot = 1 }, { text = " (IFSC " }, { slot = 2 }, { text = ")." }]] }

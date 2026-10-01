@@ -1,0 +1,11 @@
+id = "basic-anthropic-upi"
+category = "basic"
+description = "A UPI ID, which looks like an email without a dot in the domain."
+api = "anthropic_messages"
+stream = false
+pii = ["rahul.sharma@okaxis"]
+checks = ["no_leak_upstream", "restored_exact", "no_placeholder_fragment"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "Send refunds to " }, { slot = 0 }, { text = " please." }] }
+reply = { kind = "text", chunks = [[{ text = "The refund will go to " }, { slot = 0 }, { text = "." }]] }

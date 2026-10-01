@@ -1,0 +1,12 @@
+id = "tools-openai-stream-args-split"
+category = "tool_calls"
+description = "Streamed tool-call arguments with the placeholder split across two argument deltas."
+api = "openai_chat"
+stream = true
+pii = ["2345 6789 0124"]
+checks = ["no_leak_upstream", "restored_exact", "json_valid", "no_placeholder_fragment"]
+tools = [{ name = "fetch_ekyc", description = "Fetch e-KYC data for an Aadhaar number.", parameters = { type = "object", properties = { aadhaar = { type = "string" } }, required = ["aadhaar"] } }]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "Run e-KYC for " }, { slot = 0 }, { text = "." }] }
+reply = { kind = "tool_call", call_id = "call_1", name = "fetch_ekyc", argument_chunks = [[{ text = '{"aadhaar": "' }, { slot = 0, to = 4 }], [{ slot = 0, from = 4 }, { text = '"}' }]] }

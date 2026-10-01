@@ -1,0 +1,11 @@
+id = "repeat-input-twice"
+category = "repeats_adjacency"
+description = "The same value appears twice in one message and must get one placeholder."
+api = "openai_chat"
+stream = false
+pii = ["ABCPS1234K"]
+checks = ["no_leak_upstream", "restored_exact", "placeholder_stable_across_turns"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "PAN " }, { slot = 0 }, { text = ", I repeat, PAN " }, { slot = 0 }, { text = "." }] }
+reply = { kind = "text", chunks = [[{ slot = 0 }, { text = " confirmed." }]] }

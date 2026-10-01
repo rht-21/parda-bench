@@ -1,0 +1,12 @@
+id = "tools-openai-call-args"
+category = "tool_calls"
+description = "The model calls a tool with a masked value in its JSON arguments; the app must receive the real value."
+api = "openai_chat"
+stream = false
+pii = ["ABCPS1234K"]
+checks = ["no_leak_upstream", "restored_exact", "json_valid", "no_placeholder_fragment"]
+tools = [{ name = "verify_pan", description = "Check a PAN with the tax department.", parameters = { type = "object", properties = { pan = { type = "string" } }, required = ["pan"] } }]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "Verify PAN " }, { slot = 0 }, { text = "." }] }
+reply = { kind = "tool_call", call_id = "call_1", name = "verify_pan", argument_chunks = [[{ text = '{"pan": "' }, { slot = 0 }, { text = '"}' }]] }

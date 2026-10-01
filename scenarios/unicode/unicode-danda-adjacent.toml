@@ -1,0 +1,11 @@
+id = "unicode-danda-adjacent"
+category = "unicode"
+description = "A PAN directly followed by the Devanagari danda, with no space."
+api = "openai_chat"
+stream = false
+pii = ["ABCPS1234K"]
+checks = ["no_leak_upstream", "restored_exact"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "पैन:" }, { slot = 0 }, { text = "।" }] }
+reply = { kind = "text", chunks = [[{ slot = 0 }, { text = "।" }]] }

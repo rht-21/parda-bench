@@ -1,0 +1,11 @@
+id = "split-openai-three-chunks"
+category = "streaming_split"
+description = "A placeholder split across three SSE chunks."
+api = "openai_chat"
+stream = true
+pii = ["4111 1111 1111 1111"]
+checks = ["no_leak_upstream", "restored_exact", "no_placeholder_fragment"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "Block card " }, { slot = 0 }, { text = " immediately." }] }
+reply = { kind = "text", chunks = [[{ text = "Card " }, { slot = 0, to = 2 }], [{ slot = 0, from = 2, to = 6 }], [{ slot = 0, from = 6 }, { text = " is blocked." }]] }
