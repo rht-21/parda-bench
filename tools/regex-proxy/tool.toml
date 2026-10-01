@@ -1,0 +1,15 @@
+# Reference proxy shipped with Parda Bench: the regex-baseline engine behind an OpenAI/Anthropic-compatible
+# endpoint. Masks every message on the way out, restores placeholders on the way back (streamed or not).
+name = "regex-proxy"
+version = "0.1.0"
+commit = "in-repo"
+license = "Apache-2.0"
+language = "python"
+homepage = "https://github.com/rohit-vt/parda-bench"
+capabilities = ["proxy"]
+transport = { kind = "http-proxy", start = ["uv", "run", "--quiet", "--frozen", "python", "proxy.py"], base_url = "http://127.0.0.1:18431", upstream_env = "PARDA_UPSTREAM_URL" }
+
+[entity_map]
+
+[configs.default]
+env = { PARDA_PROXY_PORT = "18431" }

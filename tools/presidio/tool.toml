@@ -1,0 +1,29 @@
+# Microsoft Presidio with its out-of-the-box analyzer (spaCy en_core_web_lg plus predefined recognizers,
+# including the India ones) and the default `replace` anonymizer. Presidio cannot restore values, so the
+# restore suite is not applicable to it.
+name = "presidio"
+version = "2.2.358"
+commit = "2.2.358"
+license = "MIT"
+language = "python"
+homepage = "https://github.com/microsoft/presidio"
+capabilities = ["detect", "mask"]
+transport = { kind = "stdio", command = ["uv", "run", "--quiet", "--frozen", "python", "adapter.py"] }
+
+# LOCATION usually covers part of an address (a city or street), so it is mapped to ADDRESS and scores under
+# relaxed matching only. DATE_TIME cannot tell a birth date from any other date; it is mapped to DATE_OF_BIRTH,
+# which credits recall and charges the date decoys. Other Presidio labels stay unmapped and are reported.
+[entity_map]
+IN_AADHAAR = "AADHAAR"
+IN_PAN = "PAN"
+IN_PASSPORT = "PASSPORT"
+IN_VEHICLE_REGISTRATION = "VEHICLE_REGISTRATION"
+IN_VOTER = "VOTER_ID"
+PHONE_NUMBER = "PHONE"
+EMAIL_ADDRESS = "EMAIL"
+CREDIT_CARD = "PAYMENT_CARD"
+PERSON = "PERSON_NAME"
+LOCATION = "ADDRESS"
+DATE_TIME = "DATE_OF_BIRTH"
+
+[configs.default]

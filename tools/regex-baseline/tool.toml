@@ -1,0 +1,26 @@
+# Reference tool shipped with Parda Bench: regular expressions plus check digits, no ML.
+# It shows what structure alone catches, and gives the restore suite a library tool to exercise.
+name = "regex-baseline"
+version = "0.1.0"
+commit = "in-repo"
+license = "Apache-2.0"
+language = "python"
+homepage = "https://github.com/rohit-vt/parda-bench"
+capabilities = ["detect", "mask", "unmask", "unmask_stream"]
+transport = { kind = "stdio", command = ["uv", "run", "--quiet", "--frozen", "python", "-m", "regex_baseline"] }
+
+[entity_map]
+AADHAAR = "AADHAAR"
+AADHAAR_VID = "AADHAAR_VID"
+PAN = "PAN"
+GSTIN = "GSTIN"
+IFSC = "IFSC"
+UPI = "UPI_ID"
+PHONE = "PHONE"
+EMAIL = "EMAIL"
+CARD = "PAYMENT_CARD"
+PASSPORT = "PASSPORT"
+VOTER_ID = "VOTER_ID"
+VEHICLE = "VEHICLE_REGISTRATION"
+
+[configs.default]

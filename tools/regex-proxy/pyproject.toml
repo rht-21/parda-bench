@@ -1,0 +1,17 @@
+[project]
+name = "regex-proxy"
+version = "0.1.0"
+description = "Parda Bench reference proxy built on regex-baseline"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+dependencies = ["regex-baseline"]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+regex-baseline = { path = "../regex-baseline", editable = true }
+parda-sdk = { path = "../../sdk/python", editable = true }
+
+[tool.mypy]
+strict = true
