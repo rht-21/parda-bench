@@ -1,0 +1,119 @@
+{
+  "$defs": {
+    "Completed": {
+      "properties": {
+        "kind": {
+          "const": "completed",
+          "default": "completed",
+          "title": "Kind",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "tool_calls": {
+          "items": {
+            "$ref": "#/$defs/ObservedToolCall"
+          },
+          "title": "Tool Calls",
+          "type": "array"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "Completed",
+      "type": "object"
+    },
+    "Errored": {
+      "properties": {
+        "kind": {
+          "const": "errored",
+          "default": "errored",
+          "title": "Kind",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "http_status": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Http Status"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "title": "Errored",
+      "type": "object"
+    },
+    "ObservedToolCall": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "arguments": {
+          "description": "Raw JSON string exactly as the client library surfaced it.",
+          "title": "Arguments",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "arguments"
+      ],
+      "title": "ObservedToolCall",
+      "type": "object"
+    }
+  },
+  "description": "Driver to harness: what the application saw, one observation per turn.",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "integer"
+    },
+    "observations": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "completed": "#/$defs/Completed",
+            "errored": "#/$defs/Errored"
+          },
+          "propertyName": "kind"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/Completed"
+          },
+          {
+            "$ref": "#/$defs/Errored"
+          }
+        ]
+      },
+      "title": "Observations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "observations"
+  ],
+  "title": "DriverResponse",
+  "type": "object"
+}

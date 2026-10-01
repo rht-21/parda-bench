@@ -1,0 +1,175 @@
+{
+  "$defs": {
+    "Difficulty": {
+      "enum": [
+        "easy",
+        "medium",
+        "hard"
+      ],
+      "title": "Difficulty",
+      "type": "string"
+    },
+    "EntityType": {
+      "description": "The closed set of entity types Parda Bench labels and scores.",
+      "enum": [
+        "AADHAAR",
+        "AADHAAR_VID",
+        "PAN",
+        "GSTIN",
+        "IFSC",
+        "UPI_ID",
+        "PHONE",
+        "EMAIL",
+        "PAYMENT_CARD",
+        "PASSPORT",
+        "VOTER_ID",
+        "VEHICLE_REGISTRATION",
+        "PERSON_NAME",
+        "ADDRESS",
+        "DATE_OF_BIRTH"
+      ],
+      "title": "EntityType",
+      "type": "string"
+    },
+    "HardNegative": {
+      "additionalProperties": false,
+      "description": "A decoy that looks like `decoy` but must not be flagged; it carries no spans.",
+      "properties": {
+        "kind": {
+          "const": "hard_negative",
+          "default": "hard_negative",
+          "title": "Kind",
+          "type": "string"
+        },
+        "decoy": {
+          "$ref": "#/$defs/EntityType"
+        }
+      },
+      "required": [
+        "decoy"
+      ],
+      "title": "HardNegative",
+      "type": "object"
+    },
+    "Lang": {
+      "enum": [
+        "en",
+        "hi-Latn",
+        "hi-Deva",
+        "mixed"
+      ],
+      "title": "Lang",
+      "type": "string"
+    },
+    "Positive": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "positive",
+          "default": "positive",
+          "title": "Kind",
+          "type": "string"
+        },
+        "spans": {
+          "items": {
+            "$ref": "#/$defs/Span"
+          },
+          "title": "Spans",
+          "type": "array"
+        }
+      },
+      "required": [
+        "spans"
+      ],
+      "title": "Positive",
+      "type": "object"
+    },
+    "Source": {
+      "enum": [
+        "template",
+        "llm",
+        "handwritten"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "Span": {
+      "additionalProperties": false,
+      "description": "A labeled region of `Sample.text`.\n\nOffsets count Unicode code points (a Python `str` index), end exclusive: not bytes, not UTF-16 units.",
+      "properties": {
+        "start": {
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "title": "End",
+          "type": "integer"
+        },
+        "entity": {
+          "$ref": "#/$defs/EntityType"
+        }
+      },
+      "required": [
+        "start",
+        "end",
+        "entity"
+      ],
+      "title": "Span",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One JSONL record of the dataset.",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "text": {
+      "title": "Text",
+      "type": "string"
+    },
+    "labels": {
+      "discriminator": {
+        "mapping": {
+          "hard_negative": "#/$defs/HardNegative",
+          "positive": "#/$defs/Positive"
+        },
+        "propertyName": "kind"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Positive"
+        },
+        {
+          "$ref": "#/$defs/HardNegative"
+        }
+      ],
+      "title": "Labels"
+    },
+    "lang": {
+      "$ref": "#/$defs/Lang"
+    },
+    "difficulty": {
+      "$ref": "#/$defs/Difficulty"
+    },
+    "source": {
+      "$ref": "#/$defs/Source"
+    },
+    "generator_version": {
+      "title": "Generator Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "text",
+    "labels",
+    "lang",
+    "difficulty",
+    "source",
+    "generator_version"
+  ],
+  "title": "Sample",
+  "type": "object"
+}

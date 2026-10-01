@@ -1,0 +1,136 @@
+{
+  "$defs": {
+    "CheckFailure": {
+      "additionalProperties": false,
+      "properties": {
+        "check": {
+          "$ref": "#/$defs/CheckKind"
+        },
+        "detail": {
+          "title": "Detail",
+          "type": "string"
+        }
+      },
+      "required": [
+        "check",
+        "detail"
+      ],
+      "title": "CheckFailure",
+      "type": "object"
+    },
+    "CheckKind": {
+      "enum": [
+        "no_leak_upstream",
+        "restored_exact",
+        "no_placeholder_fragment",
+        "placeholder_stable_across_turns",
+        "json_valid",
+        "fails_closed"
+      ],
+      "title": "CheckKind",
+      "type": "string"
+    },
+    "Fail": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "const": "fail",
+          "default": "fail",
+          "title": "Status",
+          "type": "string"
+        },
+        "failures": {
+          "items": {
+            "$ref": "#/$defs/CheckFailure"
+          },
+          "title": "Failures",
+          "type": "array"
+        },
+        "upstream_excerpt": {
+          "title": "Upstream Excerpt",
+          "type": "string"
+        },
+        "client_excerpt": {
+          "title": "Client Excerpt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "failures",
+        "upstream_excerpt",
+        "client_excerpt"
+      ],
+      "title": "Fail",
+      "type": "object"
+    },
+    "NotApplicable": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "const": "not_applicable",
+          "default": "not_applicable",
+          "title": "Status",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason"
+      ],
+      "title": "NotApplicable",
+      "type": "object"
+    },
+    "Pass": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "const": "pass",
+          "default": "pass",
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "title": "Pass",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One line of `restore.jsonl`.",
+  "properties": {
+    "scenario_id": {
+      "title": "Scenario Id",
+      "type": "string"
+    },
+    "outcome": {
+      "discriminator": {
+        "mapping": {
+          "fail": "#/$defs/Fail",
+          "not_applicable": "#/$defs/NotApplicable",
+          "pass": "#/$defs/Pass"
+        },
+        "propertyName": "status"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Pass"
+        },
+        {
+          "$ref": "#/$defs/Fail"
+        },
+        {
+          "$ref": "#/$defs/NotApplicable"
+        }
+      ],
+      "title": "Outcome"
+    }
+  },
+  "required": [
+    "scenario_id",
+    "outcome"
+  ],
+  "title": "RestoreRecord",
+  "type": "object"
+}

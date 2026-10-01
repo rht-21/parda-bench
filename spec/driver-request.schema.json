@@ -1,0 +1,144 @@
+{
+  "$defs": {
+    "Api": {
+      "enum": [
+        "openai_chat",
+        "anthropic_messages"
+      ],
+      "title": "Api",
+      "type": "string"
+    },
+    "ToolDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "parameters": {
+          "additionalProperties": true,
+          "title": "Parameters",
+          "type": "object"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "parameters"
+      ],
+      "title": "ToolDefinition",
+      "type": "object"
+    },
+    "ToolResultTurn": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "tool_result",
+          "default": "tool_result",
+          "title": "Kind",
+          "type": "string"
+        },
+        "call_id": {
+          "title": "Call Id",
+          "type": "string"
+        },
+        "content": {
+          "title": "Content",
+          "type": "string"
+        }
+      },
+      "required": [
+        "call_id",
+        "content"
+      ],
+      "title": "ToolResultTurn",
+      "type": "object"
+    },
+    "UserTurn": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "user",
+          "default": "user",
+          "title": "Kind",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "UserTurn",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Harness to client-framework driver: run one conversation against `base_url` with real values.",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "integer"
+    },
+    "base_url": {
+      "title": "Base Url",
+      "type": "string"
+    },
+    "api": {
+      "$ref": "#/$defs/Api"
+    },
+    "model": {
+      "title": "Model",
+      "type": "string"
+    },
+    "stream": {
+      "title": "Stream",
+      "type": "boolean"
+    },
+    "tools": {
+      "items": {
+        "$ref": "#/$defs/ToolDefinition"
+      },
+      "title": "Tools",
+      "type": "array"
+    },
+    "turns": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "tool_result": "#/$defs/ToolResultTurn",
+            "user": "#/$defs/UserTurn"
+          },
+          "propertyName": "kind"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/UserTurn"
+          },
+          {
+            "$ref": "#/$defs/ToolResultTurn"
+          }
+        ]
+      },
+      "title": "Turns",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "base_url",
+    "api",
+    "model",
+    "stream",
+    "tools",
+    "turns"
+  ],
+  "title": "DriverRequest",
+  "type": "object"
+}

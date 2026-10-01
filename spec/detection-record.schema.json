@@ -1,0 +1,170 @@
+{
+  "$defs": {
+    "Detected": {
+      "additionalProperties": false,
+      "description": "`elapsed_ns` is tool-internal; `wall_ns` is measured by the harness and includes IPC.",
+      "properties": {
+        "status": {
+          "const": "detected",
+          "default": "detected",
+          "title": "Status",
+          "type": "string"
+        },
+        "predicted": {
+          "items": {
+            "$ref": "#/$defs/PredictedSpan"
+          },
+          "title": "Predicted",
+          "type": "array"
+        },
+        "elapsed_ns": {
+          "title": "Elapsed Ns",
+          "type": "integer"
+        },
+        "wall_ns": {
+          "title": "Wall Ns",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "predicted",
+        "elapsed_ns",
+        "wall_ns"
+      ],
+      "title": "Detected",
+      "type": "object"
+    },
+    "EntityType": {
+      "description": "The closed set of entity types Parda Bench labels and scores.",
+      "enum": [
+        "AADHAAR",
+        "AADHAAR_VID",
+        "PAN",
+        "GSTIN",
+        "IFSC",
+        "UPI_ID",
+        "PHONE",
+        "EMAIL",
+        "PAYMENT_CARD",
+        "PASSPORT",
+        "VOTER_ID",
+        "VEHICLE_REGISTRATION",
+        "PERSON_NAME",
+        "ADDRESS",
+        "DATE_OF_BIRTH"
+      ],
+      "title": "EntityType",
+      "type": "string"
+    },
+    "Failed": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "const": "failed",
+          "default": "failed",
+          "title": "Status",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "title": "Failed",
+      "type": "object"
+    },
+    "Mapped": {
+      "additionalProperties": false,
+      "properties": {
+        "mapped": {
+          "$ref": "#/$defs/EntityType"
+        }
+      },
+      "required": [
+        "mapped"
+      ],
+      "title": "Mapped",
+      "type": "object"
+    },
+    "PredictedSpan": {
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "title": "End",
+          "type": "integer"
+        },
+        "entity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Mapped"
+            },
+            {
+              "$ref": "#/$defs/Unmapped"
+            }
+          ],
+          "title": "Entity"
+        }
+      },
+      "required": [
+        "start",
+        "end",
+        "entity"
+      ],
+      "title": "PredictedSpan",
+      "type": "object"
+    },
+    "Unmapped": {
+      "additionalProperties": false,
+      "properties": {
+        "unmapped": {
+          "title": "Unmapped",
+          "type": "string"
+        }
+      },
+      "required": [
+        "unmapped"
+      ],
+      "title": "Unmapped",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One line of `detections.jsonl`.",
+  "properties": {
+    "sample_id": {
+      "title": "Sample Id",
+      "type": "string"
+    },
+    "result": {
+      "discriminator": {
+        "mapping": {
+          "detected": "#/$defs/Detected",
+          "failed": "#/$defs/Failed"
+        },
+        "propertyName": "status"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Detected"
+        },
+        {
+          "$ref": "#/$defs/Failed"
+        }
+      ],
+      "title": "Result"
+    }
+  },
+  "required": [
+    "sample_id",
+    "result"
+  ],
+  "title": "DetectionRecord",
+  "type": "object"
+}

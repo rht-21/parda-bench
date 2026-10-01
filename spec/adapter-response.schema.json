@@ -1,0 +1,271 @@
+{
+  "$defs": {
+    "Capability": {
+      "enum": [
+        "detect",
+        "mask",
+        "unmask",
+        "unmask_stream",
+        "proxy"
+      ],
+      "title": "Capability",
+      "type": "string"
+    },
+    "DetectResult": {
+      "properties": {
+        "op": {
+          "const": "detect",
+          "title": "Op",
+          "type": "string"
+        },
+        "entities": {
+          "items": {
+            "$ref": "#/$defs/DetectedEntity"
+          },
+          "title": "Entities",
+          "type": "array"
+        }
+      },
+      "required": [
+        "op",
+        "entities"
+      ],
+      "title": "DetectResult",
+      "type": "object"
+    },
+    "DetectedEntity": {
+      "description": "An entity as the tool reports it, before mapping to `EntityType`.",
+      "properties": {
+        "start": {
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "title": "End",
+          "type": "integer"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Score"
+        }
+      },
+      "required": [
+        "start",
+        "end",
+        "label"
+      ],
+      "title": "DetectedEntity",
+      "type": "object"
+    },
+    "ErrorResponse": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "integer"
+        },
+        "status": {
+          "const": "error",
+          "title": "Status",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "message"
+      ],
+      "title": "ErrorResponse",
+      "type": "object"
+    },
+    "HelloResult": {
+      "properties": {
+        "op": {
+          "const": "hello",
+          "title": "Op",
+          "type": "string"
+        },
+        "tool_version": {
+          "title": "Tool Version",
+          "type": "string"
+        },
+        "capabilities": {
+          "items": {
+            "$ref": "#/$defs/Capability"
+          },
+          "title": "Capabilities",
+          "type": "array"
+        }
+      },
+      "required": [
+        "op",
+        "tool_version",
+        "capabilities"
+      ],
+      "title": "HelloResult",
+      "type": "object"
+    },
+    "MaskResult": {
+      "properties": {
+        "op": {
+          "const": "mask",
+          "title": "Op",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "text"
+      ],
+      "title": "MaskResult",
+      "type": "object"
+    },
+    "OkResponse": {
+      "description": "`elapsed_ns` is measured inside the worker, so it excludes IPC overhead.",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "integer"
+        },
+        "status": {
+          "const": "ok",
+          "title": "Status",
+          "type": "string"
+        },
+        "elapsed_ns": {
+          "title": "Elapsed Ns",
+          "type": "integer"
+        },
+        "result": {
+          "discriminator": {
+            "mapping": {
+              "detect": "#/$defs/DetectResult",
+              "hello": "#/$defs/HelloResult",
+              "mask": "#/$defs/MaskResult",
+              "shutdown": "#/$defs/ShutdownResult",
+              "unmask": "#/$defs/UnmaskResult",
+              "unmask_stream": "#/$defs/UnmaskStreamResult"
+            },
+            "propertyName": "op"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/HelloResult"
+            },
+            {
+              "$ref": "#/$defs/DetectResult"
+            },
+            {
+              "$ref": "#/$defs/MaskResult"
+            },
+            {
+              "$ref": "#/$defs/UnmaskResult"
+            },
+            {
+              "$ref": "#/$defs/UnmaskStreamResult"
+            },
+            {
+              "$ref": "#/$defs/ShutdownResult"
+            }
+          ],
+          "title": "Result"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "elapsed_ns",
+        "result"
+      ],
+      "title": "OkResponse",
+      "type": "object"
+    },
+    "ShutdownResult": {
+      "properties": {
+        "op": {
+          "const": "shutdown",
+          "title": "Op",
+          "type": "string"
+        }
+      },
+      "required": [
+        "op"
+      ],
+      "title": "ShutdownResult",
+      "type": "object"
+    },
+    "UnmaskResult": {
+      "properties": {
+        "op": {
+          "const": "unmask",
+          "title": "Op",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "text"
+      ],
+      "title": "UnmaskResult",
+      "type": "object"
+    },
+    "UnmaskStreamResult": {
+      "description": "Text safe to emit now; the tool may hold back a partial placeholder until a later chunk.",
+      "properties": {
+        "op": {
+          "const": "unmask_stream",
+          "title": "Op",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "text"
+      ],
+      "title": "UnmaskStreamResult",
+      "type": "object"
+    }
+  },
+  "discriminator": {
+    "mapping": {
+      "error": "#/$defs/ErrorResponse",
+      "ok": "#/$defs/OkResponse"
+    },
+    "propertyName": "status"
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/OkResponse"
+    },
+    {
+      "$ref": "#/$defs/ErrorResponse"
+    }
+  ]
+}

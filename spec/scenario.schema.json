@@ -1,0 +1,447 @@
+{
+  "$defs": {
+    "Api": {
+      "enum": [
+        "openai_chat",
+        "anthropic_messages"
+      ],
+      "title": "Api",
+      "type": "string"
+    },
+    "Category": {
+      "enum": [
+        "basic",
+        "streaming_split",
+        "tool_calls",
+        "multi_turn",
+        "placeholder_mangling",
+        "repeats_adjacency",
+        "unicode",
+        "structured_output",
+        "failure_behaviour"
+      ],
+      "title": "Category",
+      "type": "string"
+    },
+    "CheckKind": {
+      "enum": [
+        "no_leak_upstream",
+        "restored_exact",
+        "no_placeholder_fragment",
+        "placeholder_stable_across_turns",
+        "json_valid",
+        "fails_closed"
+      ],
+      "title": "CheckKind",
+      "type": "string"
+    },
+    "HttpErrorReply": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "http_error",
+          "title": "Kind",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "integer"
+        },
+        "body": {
+          "title": "Body",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "status",
+        "body"
+      ],
+      "title": "HttpErrorReply",
+      "type": "object"
+    },
+    "LiteralInput": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "LiteralInput",
+      "type": "object"
+    },
+    "LiteralReply": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "LiteralReply",
+      "type": "object"
+    },
+    "Mangle": {
+      "enum": [
+        "lowercase",
+        "uppercase",
+        "strip_delimiters",
+        "space_padded"
+      ],
+      "title": "Mangle",
+      "type": "string"
+    },
+    "SlotInput": {
+      "additionalProperties": false,
+      "properties": {
+        "slot": {
+          "title": "Slot",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "slot"
+      ],
+      "title": "SlotInput",
+      "type": "object"
+    },
+    "SlotReply": {
+      "additionalProperties": false,
+      "description": "(Part of) the placeholder the tool chose for `slot`, optionally altered the way models do.",
+      "properties": {
+        "slot": {
+          "title": "Slot",
+          "type": "integer"
+        },
+        "from": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Char range of the placeholder to emit; omitted bounds mean start/end of the placeholder.",
+          "title": "From"
+        },
+        "to": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "To"
+        },
+        "mangle": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Mangle"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "slot"
+      ],
+      "title": "SlotReply",
+      "type": "object"
+    },
+    "TextReply": {
+      "additionalProperties": false,
+      "description": "Each inner list is one SSE chunk when streaming.",
+      "properties": {
+        "kind": {
+          "const": "text",
+          "title": "Kind",
+          "type": "string"
+        },
+        "chunks": {
+          "items": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/LiteralReply"
+                },
+                {
+                  "$ref": "#/$defs/SlotReply"
+                }
+              ]
+            },
+            "type": "array"
+          },
+          "title": "Chunks",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "chunks"
+      ],
+      "title": "TextReply",
+      "type": "object"
+    },
+    "ToolCallReply": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "tool_call",
+          "title": "Kind",
+          "type": "string"
+        },
+        "call_id": {
+          "title": "Call Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "argument_chunks": {
+          "items": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/LiteralReply"
+                },
+                {
+                  "$ref": "#/$defs/SlotReply"
+                }
+              ]
+            },
+            "type": "array"
+          },
+          "title": "Argument Chunks",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "call_id",
+        "name",
+        "argument_chunks"
+      ],
+      "title": "ToolCallReply",
+      "type": "object"
+    },
+    "ToolDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "parameters": {
+          "additionalProperties": true,
+          "title": "Parameters",
+          "type": "object"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "parameters"
+      ],
+      "title": "ToolDefinition",
+      "type": "object"
+    },
+    "ToolResultInput": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "tool_result",
+          "title": "Kind",
+          "type": "string"
+        },
+        "call_id": {
+          "title": "Call Id",
+          "type": "string"
+        },
+        "content": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/LiteralInput"
+              },
+              {
+                "$ref": "#/$defs/SlotInput"
+              }
+            ]
+          },
+          "title": "Content",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "call_id",
+        "content"
+      ],
+      "title": "ToolResultInput",
+      "type": "object"
+    },
+    "Turn": {
+      "additionalProperties": false,
+      "properties": {
+        "input": {
+          "discriminator": {
+            "mapping": {
+              "tool_result": "#/$defs/ToolResultInput",
+              "user": "#/$defs/UserInput"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/UserInput"
+            },
+            {
+              "$ref": "#/$defs/ToolResultInput"
+            }
+          ],
+          "title": "Input"
+        },
+        "reply": {
+          "discriminator": {
+            "mapping": {
+              "http_error": "#/$defs/HttpErrorReply",
+              "text": "#/$defs/TextReply",
+              "tool_call": "#/$defs/ToolCallReply"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/TextReply"
+            },
+            {
+              "$ref": "#/$defs/ToolCallReply"
+            },
+            {
+              "$ref": "#/$defs/HttpErrorReply"
+            }
+          ],
+          "title": "Reply"
+        }
+      },
+      "required": [
+        "input",
+        "reply"
+      ],
+      "title": "Turn",
+      "type": "object"
+    },
+    "UserInput": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "user",
+          "title": "Kind",
+          "type": "string"
+        },
+        "message": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/LiteralInput"
+              },
+              {
+                "$ref": "#/$defs/SlotInput"
+              }
+            ]
+          },
+          "title": "Message",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "message"
+      ],
+      "title": "UserInput",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One restore test, authored as `scenarios/<category>/<id>.toml`.\n\n`pii` holds the real values; segments refer to them by index (`slot`). The mock upstream learns each slot's\nplaceholder by aligning the masked request it receives against the input's literal segments.",
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "category": {
+      "$ref": "#/$defs/Category"
+    },
+    "description": {
+      "title": "Description",
+      "type": "string"
+    },
+    "api": {
+      "$ref": "#/$defs/Api"
+    },
+    "stream": {
+      "title": "Stream",
+      "type": "boolean"
+    },
+    "pii": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Pii",
+      "type": "array"
+    },
+    "tools": {
+      "items": {
+        "$ref": "#/$defs/ToolDefinition"
+      },
+      "title": "Tools",
+      "type": "array"
+    },
+    "turns": {
+      "items": {
+        "$ref": "#/$defs/Turn"
+      },
+      "title": "Turns",
+      "type": "array"
+    },
+    "checks": {
+      "items": {
+        "$ref": "#/$defs/CheckKind"
+      },
+      "title": "Checks",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "category",
+    "description",
+    "api",
+    "stream",
+    "pii",
+    "turns",
+    "checks"
+  ],
+  "title": "Scenario",
+  "type": "object"
+}

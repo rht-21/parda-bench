@@ -1,0 +1,197 @@
+{
+  "$defs": {
+    "DetectRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "integer"
+        },
+        "op": {
+          "const": "detect",
+          "default": "detect",
+          "title": "Op",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "text"
+      ],
+      "title": "DetectRequest",
+      "type": "object"
+    },
+    "HelloRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "integer"
+        },
+        "op": {
+          "const": "hello",
+          "default": "hello",
+          "title": "Op",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "HelloRequest",
+      "type": "object"
+    },
+    "MaskRequest": {
+      "additionalProperties": false,
+      "description": "Mask `text`, remembering placeholders under `session` for later unmasking.",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "integer"
+        },
+        "op": {
+          "const": "mask",
+          "default": "mask",
+          "title": "Op",
+          "type": "string"
+        },
+        "session": {
+          "title": "Session",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "session",
+        "text"
+      ],
+      "title": "MaskRequest",
+      "type": "object"
+    },
+    "ShutdownRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "integer"
+        },
+        "op": {
+          "const": "shutdown",
+          "default": "shutdown",
+          "title": "Op",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "ShutdownRequest",
+      "type": "object"
+    },
+    "UnmaskRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "integer"
+        },
+        "op": {
+          "const": "unmask",
+          "default": "unmask",
+          "title": "Op",
+          "type": "string"
+        },
+        "session": {
+          "title": "Session",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "session",
+        "text"
+      ],
+      "title": "UnmaskRequest",
+      "type": "object"
+    },
+    "UnmaskStreamRequest": {
+      "additionalProperties": false,
+      "description": "Feed one streamed chunk; `is_final` tells the tool to flush anything it held back.",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "integer"
+        },
+        "op": {
+          "const": "unmask_stream",
+          "default": "unmask_stream",
+          "title": "Op",
+          "type": "string"
+        },
+        "session": {
+          "title": "Session",
+          "type": "string"
+        },
+        "chunk": {
+          "title": "Chunk",
+          "type": "string"
+        },
+        "is_final": {
+          "title": "Is Final",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "session",
+        "chunk",
+        "is_final"
+      ],
+      "title": "UnmaskStreamRequest",
+      "type": "object"
+    }
+  },
+  "discriminator": {
+    "mapping": {
+      "detect": "#/$defs/DetectRequest",
+      "hello": "#/$defs/HelloRequest",
+      "mask": "#/$defs/MaskRequest",
+      "shutdown": "#/$defs/ShutdownRequest",
+      "unmask": "#/$defs/UnmaskRequest",
+      "unmask_stream": "#/$defs/UnmaskStreamRequest"
+    },
+    "propertyName": "op"
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/HelloRequest"
+    },
+    {
+      "$ref": "#/$defs/DetectRequest"
+    },
+    {
+      "$ref": "#/$defs/MaskRequest"
+    },
+    {
+      "$ref": "#/$defs/UnmaskRequest"
+    },
+    {
+      "$ref": "#/$defs/UnmaskStreamRequest"
+    },
+    {
+      "$ref": "#/$defs/ShutdownRequest"
+    }
+  ]
+}

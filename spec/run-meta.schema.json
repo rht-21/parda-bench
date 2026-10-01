@@ -1,0 +1,163 @@
+{
+  "$defs": {
+    "DetectionSuite": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "detection",
+          "default": "detection",
+          "title": "Kind",
+          "type": "string"
+        },
+        "dataset_version": {
+          "title": "Dataset Version",
+          "type": "string"
+        },
+        "dataset_sha256": {
+          "title": "Dataset Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dataset_version",
+        "dataset_sha256"
+      ],
+      "title": "DetectionSuite",
+      "type": "object"
+    },
+    "Hardware": {
+      "additionalProperties": false,
+      "properties": {
+        "os": {
+          "title": "Os",
+          "type": "string"
+        },
+        "arch": {
+          "title": "Arch",
+          "type": "string"
+        },
+        "cpu": {
+          "title": "Cpu",
+          "type": "string"
+        },
+        "cores": {
+          "title": "Cores",
+          "type": "integer"
+        },
+        "memory_mb": {
+          "title": "Memory Mb",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "os",
+        "arch",
+        "cpu",
+        "cores",
+        "memory_mb"
+      ],
+      "title": "Hardware",
+      "type": "object"
+    },
+    "RestoreSuite": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "restore",
+          "default": "restore",
+          "title": "Kind",
+          "type": "string"
+        },
+        "driver": {
+          "title": "Driver",
+          "type": "string"
+        }
+      },
+      "required": [
+        "driver"
+      ],
+      "title": "RestoreSuite",
+      "type": "object"
+    },
+    "ToolRef": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        },
+        "commit": {
+          "title": "Commit",
+          "type": "string"
+        },
+        "config": {
+          "title": "Config",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "commit",
+        "config"
+      ],
+      "title": "ToolRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "`meta.json` of one run.",
+  "properties": {
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "started_at": {
+      "description": "RFC 3339 timestamp.",
+      "title": "Started At",
+      "type": "string"
+    },
+    "harness_version": {
+      "title": "Harness Version",
+      "type": "string"
+    },
+    "tool": {
+      "$ref": "#/$defs/ToolRef"
+    },
+    "hardware": {
+      "$ref": "#/$defs/Hardware"
+    },
+    "suite": {
+      "discriminator": {
+        "mapping": {
+          "detection": "#/$defs/DetectionSuite",
+          "restore": "#/$defs/RestoreSuite"
+        },
+        "propertyName": "kind"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/DetectionSuite"
+        },
+        {
+          "$ref": "#/$defs/RestoreSuite"
+        }
+      ],
+      "title": "Suite"
+    }
+  },
+  "required": [
+    "run_id",
+    "started_at",
+    "harness_version",
+    "tool",
+    "hardware",
+    "suite"
+  ],
+  "title": "RunMeta",
+  "type": "object"
+}
