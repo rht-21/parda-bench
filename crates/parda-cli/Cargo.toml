@@ -1,0 +1,34 @@
+[package]
+name = "parda-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "parda-bench"
+path = "src/main.rs"
+
+[dependencies]
+parda-spec.workspace = true
+parda-data.workspace = true
+parda-adapters.workspace = true
+parda-eval.workspace = true
+parda-restore.workspace = true
+parda-report.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+humantime.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true
