@@ -1,0 +1,13 @@
+name = "fake-http-tool"
+version = "0.0.0"
+commit = "none"
+license = "Apache-2.0"
+language = "python"
+homepage = "https://example.invalid"
+capabilities = ["detect"]
+transport = { kind = "http-api", start = ["python3", "server.py"], base_url = "http://127.0.0.1:18432/" }
+
+[entity_map]
+WORD = "PERSON_NAME"
+
+[configs.default]

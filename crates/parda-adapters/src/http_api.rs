@@ -9,8 +9,8 @@ use crate::process::GroupChild;
 use parda_spec::protocol::adapter::{AdapterOp, AdapterRequest, AdapterResponse};
 
 pub struct HttpApiTool {
-    /// Held so the service is killed when the tool is dropped.
-    _process: GroupChild,
+    /// Killed with the tool, or explicitly by `terminate`.
+    process: GroupChild,
     client: reqwest::Client,
     base_url: String,
     next_id: u64,
@@ -20,7 +20,7 @@ impl HttpApiTool {
     #[must_use]
     pub fn new(process: GroupChild, base_url: String) -> Self {
         Self {
-            _process: process,
+            process,
             client: reqwest::Client::new(),
             base_url,
             next_id: 1,
@@ -64,5 +64,10 @@ impl HttpApiTool {
                 source,
             })?;
         accept(id, parsed, wall)
+    }
+
+    /// Stops the service and waits for it to exit.
+    pub async fn terminate(mut self) {
+        self.process.terminate().await;
     }
 }

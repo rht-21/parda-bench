@@ -76,7 +76,7 @@ pub async fn run_proxy(
     let mut proxy = spawn_service(&tool.dir, start, &env, output)?;
     wait_until_listening(base_url, &mut proxy, STARTUP_TIMEOUT).await?;
     let records = run_with_driver(driver, &mock, base_url, scenarios).await;
-    drop(proxy);
+    proxy.terminate().await;
     records
 }
 

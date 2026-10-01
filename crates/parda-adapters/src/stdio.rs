@@ -84,7 +84,7 @@ impl StdioWorker {
             .await
             .is_err()
         {
-            self.process.kill_group();
+            self.process.terminate().await;
         }
     }
 }

@@ -140,7 +140,7 @@ impl Adapter {
     pub async fn shutdown(self) {
         match self {
             Self::Stdio(w) => w.shutdown().await,
-            Self::HttpApi(h) => drop(h),
+            Self::HttpApi(h) => h.terminate().await,
         }
     }
 }

@@ -50,6 +50,16 @@ impl GroupChild {
     }
 }
 
+impl GroupChild {
+    /// Kills the process group and waits until the direct child has exited, so its ports and files are released.
+    pub async fn terminate(&mut self) {
+        self.kill_group();
+        if let Err(e) = self.child.wait().await {
+            tracing::warn!("waiting for killed process: {e}");
+        }
+    }
+}
+
 impl Drop for GroupChild {
     fn drop(&mut self) {
         self.kill_group();
