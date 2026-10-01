@@ -1,0 +1,97 @@
+# Hinglish (Hindi in Latin script) templates.
+
+[[template]]
+id = "hl-kyc-01"
+lang = "hi-Latn"
+difficulty = "easy"
+text = "Mera naam {name} hai aur mera Aadhaar number {aadhaar:spaced} hai."
+
+[[template]]
+id = "hl-kyc-02"
+lang = "hi-Latn"
+difficulty = "medium"
+text = "Bhai PAN card ka number {pan} hai, KYC ke liye bhej diya."
+
+[[template]]
+id = "hl-upi-01"
+lang = "hi-Latn"
+difficulty = "easy"
+text = "Paise {upi:name} pe bhej do, GPay chal raha hai."
+
+[[template]]
+id = "hl-upi-02"
+lang = "hi-Latn"
+difficulty = "medium"
+text = "PhonePe pe {upi:phone} pe 500 bhejna, urgent hai yaar"
+
+[[template]]
+id = "hl-phone-01"
+lang = "hi-Latn"
+difficulty = "easy"
+text = "Mera naya number {phone} hai, isko save kar lo."
+
+[[template]]
+id = "hl-phone-02"
+lang = "hi-Latn"
+difficulty = "hard"
+text = "kal call krna {phone:plain} pe, {name:first} bol rha hu"
+
+[[template]]
+id = "hl-address-01"
+lang = "hi-Latn"
+difficulty = "medium"
+text = "Parcel is address pe bhejna: {address:latin}. Ghar pe koi na ho toh {phone:intl} pe call karna."
+
+[[template]]
+id = "hl-bank-01"
+lang = "hi-Latn"
+difficulty = "medium"
+text = "Account {name} ke naam pe hai, IFSC code {ifsc} hai, NEFT kar dena."
+
+[[template]]
+id = "hl-card-01"
+lang = "hi-Latn"
+difficulty = "hard"
+text = "card no {card:spaced} hai aur expiry 08/29, cvv nahi bataunga"
+
+[[template]]
+id = "hl-dob-01"
+lang = "hi-Latn"
+difficulty = "easy"
+text = "Meri date of birth {dob:slashed} hai, form mein galat likha hai."
+
+[[template]]
+id = "hl-email-01"
+lang = "hi-Latn"
+difficulty = "easy"
+text = "Mail kar do {email} pe, office wala ID hai."
+
+[[template]]
+id = "hl-vehicle-01"
+lang = "hi-Latn"
+difficulty = "medium"
+text = "Gaadi number {vehicle:spaced} hai, challan mere naam pe aaya hai: {name}."
+
+[[template]]
+id = "hl-travel-01"
+lang = "hi-Latn"
+difficulty = "medium"
+text = "Passport {passport} hai mera, aur voter ID {voter}. Dono ki copy chahiye kya?"
+
+[[template]]
+id = "hl-gst-01"
+lang = "hi-Latn"
+difficulty = "medium"
+text = "Dukaan ka GST number {gstin} hai, bill pe daal dena."
+
+[[template]]
+id = "hl-vid-01"
+lang = "hi-Latn"
+difficulty = "hard"
+text = "aadhaar ki jagah VID de do na {vid:plain}, safe rehta hai"
+
+[[template]]
+id = "hl-empty-01"
+lang = "hi-Latn"
+difficulty = "easy"
+text = "Kal meeting 4 baje hai, sab log time pe aa jana."

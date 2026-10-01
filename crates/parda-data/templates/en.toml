@@ -1,0 +1,209 @@
+# English templates. Filler syntax and styles: see docs/dataset.md.
+
+[[template]]
+id = "en-kyc-01"
+lang = "en"
+difficulty = "easy"
+text = "Please update my KYC. Name: {name}, Aadhaar: {aadhaar:spaced}, PAN: {pan}."
+
+[[template]]
+id = "en-kyc-02"
+lang = "en"
+difficulty = "easy"
+text = "I, {name}, holder of PAN {pan}, hereby declare that the information provided above is true."
+
+[[template]]
+id = "en-bank-01"
+lang = "en"
+difficulty = "easy"
+text = "Kindly transfer the refund to account holder {name}, IFSC {ifsc}."
+
+[[template]]
+id = "en-bank-02"
+lang = "en"
+difficulty = "medium"
+text = "Hi, the payment failed twice. Card used: {card:spaced}. Registered mobile {phone:intl}."
+
+[[template]]
+id = "en-support-01"
+lang = "en"
+difficulty = "easy"
+text = "My registered email is {email} and my phone number is {phone}. Please call after 6 pm."
+
+[[template]]
+id = "en-upi-01"
+lang = "en"
+difficulty = "easy"
+text = "Send the money to my UPI ID {upi:name}, not the old one."
+
+[[template]]
+id = "en-upi-02"
+lang = "en"
+difficulty = "medium"
+text = "Paid ₹2,450 via UPI to {upi:phone} for the electricity bill."
+
+[[template]]
+id = "en-gst-01"
+lang = "en"
+difficulty = "easy"
+text = "Please mention our GSTIN {gstin} on the invoice."
+
+[[template]]
+id = "en-gst-02"
+lang = "en"
+difficulty = "medium"
+text = "Bill to: {name}, GSTIN: {gstin}, Address: {address:latin}"
+
+[[template]]
+id = "en-address-01"
+lang = "en"
+difficulty = "easy"
+text = "Deliver the parcel to {address:latin}. Contact: {phone}."
+
+[[template]]
+id = "en-travel-01"
+lang = "en"
+difficulty = "easy"
+text = "Passport number {passport}, issued to {name:upper}, date of birth {dob:slashed}."
+
+[[template]]
+id = "en-travel-02"
+lang = "en"
+difficulty = "medium"
+text = "Traveller {name}, DOB {dob:iso}, passport {passport}, mobile {phone:intl_hyphen}."
+
+[[template]]
+id = "en-voter-01"
+lang = "en"
+difficulty = "easy"
+text = "My voter ID card number is {voter}; the address printed on it is {address:latin}."
+
+[[template]]
+id = "en-vehicle-01"
+lang = "en"
+difficulty = "easy"
+text = "The car with registration {vehicle:spaced} is registered to {name}."
+
+[[template]]
+id = "en-vehicle-02"
+lang = "en"
+difficulty = "medium"
+text = "e-Challan generated for vehicle {vehicle:plain}. Owner: {name}, mobile {phone:zero}."
+
+[[template]]
+id = "en-vid-01"
+lang = "en"
+difficulty = "easy"
+text = "Use your Virtual ID {vid:spaced} instead of your Aadhaar number for e-KYC."
+
+[[template]]
+id = "en-dob-01"
+lang = "en"
+difficulty = "easy"
+text = "{name} was born on {dob:long}."
+
+[[template]]
+id = "en-dob-02"
+lang = "en"
+difficulty = "medium"
+text = "DOB: {dob:dotted} | Name: {name:upper} | Mobile: {phone:plain}"
+
+[[template]]
+id = "en-form-01"
+lang = "en"
+difficulty = "medium"
+text = '''Applicant Name: {name}
+Father's Name: {other_name}
+Date of Birth: {dob:slashed}
+Aadhaar No.: {aadhaar:spaced}
+Mobile: {phone:intl}'''
+
+[[template]]
+id = "en-email-01"
+lang = "en"
+difficulty = "easy"
+text = "Forwarding the statement to {email:title} as requested by {name:first}."
+
+[[template]]
+id = "en-chat-01"
+lang = "en"
+difficulty = "medium"
+text = "hey its {name:first} here, my new number is {phone:split}, save it pls"
+
+[[template]]
+id = "en-json-01"
+lang = "en"
+difficulty = "hard"
+text = '{{"customer": "{name}", "pan": "{pan}", "phone": "{phone:plain}", "email": "{email}"}}'
+
+[[template]]
+id = "en-log-01"
+lang = "en"
+difficulty = "hard"
+text = "2025-11-03T10:22:41Z INFO payment.verify user_email={email} card={card:plain} upi={upi} status=OK"
+
+[[template]]
+id = "en-noisy-01"
+lang = "en"
+difficulty = "hard"
+text = "aadhaar no-{aadhaar:plain} pan:{pan:lower} ph {phone:plain}"
+
+[[template]]
+id = "en-noisy-02"
+lang = "en"
+difficulty = "hard"
+text = "PLS CHK MY ACCT. IFSC={ifsc:lower} CARD {card:hyphen} NAME {name:upper}"
+
+[[template]]
+id = "en-medical-01"
+lang = "en"
+difficulty = "medium"
+text = "Patient {name}, aged 54, DOB {dob:hyphen}, Aadhaar {aadhaar:hyphen}, admitted on 12 March for observation."
+
+[[template]]
+id = "en-insurance-01"
+lang = "en"
+difficulty = "medium"
+text = "Policyholder: {name}; Nominee: {other_name}; Contact: {email}; PAN: {pan}"
+
+[[template]]
+id = "en-loan-01"
+lang = "en"
+difficulty = "medium"
+text = "Loan application by {name} (PAN {pan}) for two-wheeler {vehicle:hyphen}; salary is credited to IFSC {ifsc}."
+
+[[template]]
+id = "en-sms-01"
+lang = "en"
+difficulty = "medium"
+text = "Dear Customer, the OTP for linking Aadhaar {aadhaar:spaced} with mobile {phone:intl} is 482913. Do not share it."
+
+[[template]]
+id = "en-rent-01"
+lang = "en"
+difficulty = "medium"
+text = "Rent agreement between {name} (landlord) and {other_name} (tenant) for the premises at {address:latin}."
+
+[[template]]
+id = "en-chat-02"
+lang = "en"
+difficulty = "hard"
+text = "ok sending now -> {upi:name} ... if it fails ping me on {phone:zero}"
+
+[[template]]
+id = "en-empty-01"
+lang = "en"
+difficulty = "easy"
+text = "The meeting has been moved to Thursday at 4 pm in the main conference room."
+
+[[template]]
+id = "en-empty-02"
+lang = "en"
+difficulty = "easy"
+text = "Please find attached the quarterly report and let me know if you have questions."
+
+[[template]]
+id = "en-empty-03"
+lang = "en"
+difficulty = "medium"
+text = "Our office will remain closed on 26 January on account of Republic Day."
