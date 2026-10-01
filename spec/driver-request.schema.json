@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DriverRequest",
+  "description": "Harness to client-framework driver: run one conversation against `base_url` with real (unmasked) values.",
+  "type": "object",
+  "properties": {
+    "api": {
+      "$ref": "#/$defs/Api"
+    },
+    "base_url": {
+      "type": "string"
+    },
+    "id": {
+      "type": "integer",
+      "format": "uint64",
+      "minimum": 0
+    },
+    "model": {
+      "type": "string"
+    },
+    "stream": {
+      "type": "boolean"
+    },
+    "tools": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ToolDefinition"
+      }
+    },
+    "turns": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/DriverTurn"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "base_url",
+    "api",
+    "model",
+    "stream",
+    "tools",
+    "turns"
+  ],
+  "$defs": {
+    "Api": {
+      "type": "string",
+      "enum": [
+        "openai_chat",
+        "anthropic_messages"
+      ]
+    },
+    "DriverTurn": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "user"
+            },
+            "text": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "text"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "call_id": {
+              "type": "string"
+            },
+            "content": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string",
+              "const": "tool_result"
+            }
+          },
+          "required": [
+            "kind",
+            "call_id",
+            "content"
+          ]
+        }
+      ]
+    },
+    "ToolDefinition": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "parameters": true
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "description",
+        "parameters"
+      ]
+    }
+  }
+}

@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ToolManifest",
+  "description": "Contents of `tools/<name>/tool.toml`.",
+  "type": "object",
+  "properties": {
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Capability"
+      }
+    },
+    "commit": {
+      "type": "string"
+    },
+    "configs": {
+      "description": "Named configurations; `default` is required by the harness, `tuned` only when the tool's docs recommend one.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/ToolConfig"
+      }
+    },
+    "entity_map": {
+      "description": "Tool's own label to Parda entity type; labels missing here are scored as unmapped, never dropped.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/EntityType"
+      }
+    },
+    "homepage": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string"
+    },
+    "license": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "transport": {
+      "$ref": "#/$defs/Transport"
+    },
+    "version": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "version",
+    "commit",
+    "license",
+    "language",
+    "homepage",
+    "transport",
+    "capabilities",
+    "entity_map",
+    "configs"
+  ],
+  "$defs": {
+    "Capability": {
+      "type": "string",
+      "enum": [
+        "detect",
+        "mask",
+        "unmask",
+        "unmask_stream",
+        "proxy"
+      ]
+    },
+    "EntityType": {
+      "description": "The closed set of entity types Parda Bench labels and scores.",
+      "type": "string",
+      "enum": [
+        "AADHAAR",
+        "AADHAAR_VID",
+        "PAN",
+        "GSTIN",
+        "IFSC",
+        "UPI_ID",
+        "PHONE",
+        "EMAIL",
+        "PAYMENT_CARD",
+        "PASSPORT",
+        "VOTER_ID",
+        "VEHICLE_REGISTRATION",
+        "PERSON_NAME",
+        "ADDRESS",
+        "DATE_OF_BIRTH"
+      ]
+    },
+    "ToolConfig": {
+      "type": "object",
+      "properties": {
+        "env": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "default": {}
+        },
+        "file": {
+          "description": "Tool-specific config file, relative to the tool directory.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "Transport": {
+      "description": "How the harness starts and reaches a tool. Commands run with `tools/<name>/` as working directory.",
+      "oneOf": [
+        {
+          "description": "Long-lived worker speaking the NDJSON adapter protocol on stdin/stdout.",
+          "type": "object",
+          "properties": {
+            "command": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "kind": {
+              "type": "string",
+              "const": "stdio"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "command"
+          ]
+        },
+        {
+          "description": "OpenAI/Anthropic-compatible proxy; the harness sets `upstream_env` to the mock upstream URL.",
+          "type": "object",
+          "properties": {
+            "base_url": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string",
+              "const": "http-proxy"
+            },
+            "start": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "upstream_env": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "start",
+            "base_url",
+            "upstream_env"
+          ]
+        },
+        {
+          "description": "Service exposing its own REST detect/mask endpoints.",
+          "type": "object",
+          "properties": {
+            "base_url": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string",
+              "const": "http-api"
+            },
+            "start": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "start",
+            "base_url"
+          ]
+        }
+      ]
+    }
+  }
+}

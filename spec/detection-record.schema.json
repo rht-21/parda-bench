@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DetectionRecord",
+  "description": "One line of `detections.jsonl`.",
+  "type": "object",
+  "properties": {
+    "result": {
+      "$ref": "#/$defs/DetectionResult"
+    },
+    "sample_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "sample_id",
+    "result"
+  ],
+  "$defs": {
+    "DetectionResult": {
+      "oneOf": [
+        {
+          "description": "`elapsed_ns` is tool-internal; `wall_ns` is measured by the harness and includes IPC.",
+          "type": "object",
+          "properties": {
+            "elapsed_ns": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0
+            },
+            "predicted": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/PredictedSpan"
+              }
+            },
+            "status": {
+              "type": "string",
+              "const": "detected"
+            },
+            "wall_ns": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "status",
+            "predicted",
+            "elapsed_ns",
+            "wall_ns"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string",
+              "const": "failed"
+            }
+          },
+          "required": [
+            "status",
+            "message"
+          ]
+        }
+      ]
+    },
+    "EntityType": {
+      "description": "The closed set of entity types Parda Bench labels and scores.",
+      "type": "string",
+      "enum": [
+        "AADHAAR",
+        "AADHAAR_VID",
+        "PAN",
+        "GSTIN",
+        "IFSC",
+        "UPI_ID",
+        "PHONE",
+        "EMAIL",
+        "PAYMENT_CARD",
+        "PASSPORT",
+        "VOTER_ID",
+        "VEHICLE_REGISTRATION",
+        "PERSON_NAME",
+        "ADDRESS",
+        "DATE_OF_BIRTH"
+      ]
+    },
+    "PredictedEntity": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "mapped": {
+              "$ref": "#/$defs/EntityType"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "mapped"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "unmapped": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "unmapped"
+          ]
+        }
+      ]
+    },
+    "PredictedSpan": {
+      "type": "object",
+      "properties": {
+        "end": {
+          "type": "integer",
+          "format": "uint",
+          "minimum": 0
+        },
+        "entity": {
+          "$ref": "#/$defs/PredictedEntity"
+        },
+        "start": {
+          "type": "integer",
+          "format": "uint",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "start",
+        "end",
+        "entity"
+      ]
+    }
+  }
+}

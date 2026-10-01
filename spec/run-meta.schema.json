@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RunMeta",
+  "description": "`meta.json` of one run.",
+  "type": "object",
+  "properties": {
+    "hardware": {
+      "$ref": "#/$defs/Hardware"
+    },
+    "harness_version": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "started_at": {
+      "description": "RFC 3339 timestamp.",
+      "type": "string"
+    },
+    "suite": {
+      "$ref": "#/$defs/Suite"
+    },
+    "tool": {
+      "$ref": "#/$defs/ToolRef"
+    }
+  },
+  "required": [
+    "run_id",
+    "started_at",
+    "harness_version",
+    "tool",
+    "hardware",
+    "suite"
+  ],
+  "$defs": {
+    "Hardware": {
+      "type": "object",
+      "properties": {
+        "arch": {
+          "type": "string"
+        },
+        "cores": {
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "cpu": {
+          "type": "string"
+        },
+        "memory_mb": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "os": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "os",
+        "arch",
+        "cpu",
+        "cores",
+        "memory_mb"
+      ]
+    },
+    "Suite": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "dataset_sha256": {
+              "type": "string"
+            },
+            "dataset_version": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string",
+              "const": "detection"
+            }
+          },
+          "required": [
+            "kind",
+            "dataset_version",
+            "dataset_sha256"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "driver": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string",
+              "const": "restore"
+            }
+          },
+          "required": [
+            "kind",
+            "driver"
+          ]
+        }
+      ]
+    },
+    "ToolRef": {
+      "type": "object",
+      "properties": {
+        "commit": {
+          "type": "string"
+        },
+        "config": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "commit",
+        "config"
+      ]
+    }
+  }
+}

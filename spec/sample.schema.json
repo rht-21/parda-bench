@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Sample",
+  "description": "One JSONL record of the dataset.",
+  "type": "object",
+  "properties": {
+    "difficulty": {
+      "$ref": "#/$defs/Difficulty"
+    },
+    "generator_version": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "labels": {
+      "$ref": "#/$defs/Labels"
+    },
+    "lang": {
+      "$ref": "#/$defs/Lang"
+    },
+    "source": {
+      "$ref": "#/$defs/Source"
+    },
+    "text": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "text",
+    "labels",
+    "lang",
+    "difficulty",
+    "source",
+    "generator_version"
+  ],
+  "$defs": {
+    "Difficulty": {
+      "type": "string",
+      "enum": [
+        "easy",
+        "medium",
+        "hard"
+      ]
+    },
+    "EntityType": {
+      "description": "The closed set of entity types Parda Bench labels and scores.",
+      "type": "string",
+      "enum": [
+        "AADHAAR",
+        "AADHAAR_VID",
+        "PAN",
+        "GSTIN",
+        "IFSC",
+        "UPI_ID",
+        "PHONE",
+        "EMAIL",
+        "PAYMENT_CARD",
+        "PASSPORT",
+        "VOTER_ID",
+        "VEHICLE_REGISTRATION",
+        "PERSON_NAME",
+        "ADDRESS",
+        "DATE_OF_BIRTH"
+      ]
+    },
+    "Labels": {
+      "description": "Gold labels: either real entities, or a decoy that looks like one but must not be flagged.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "positive"
+            },
+            "spans": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Span"
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "spans"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "decoy": {
+              "$ref": "#/$defs/EntityType"
+            },
+            "kind": {
+              "type": "string",
+              "const": "hard_negative"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "decoy"
+          ]
+        }
+      ]
+    },
+    "Lang": {
+      "type": "string",
+      "enum": [
+        "en",
+        "hi-Latn",
+        "hi-Deva",
+        "mixed"
+      ]
+    },
+    "Source": {
+      "type": "string",
+      "enum": [
+        "template",
+        "llm",
+        "handwritten"
+      ]
+    },
+    "Span": {
+      "description": "A labeled region of `Sample::text`.\n\nOffsets count Unicode scalar values (Rust `char`, Python `str` index), end exclusive — not bytes, not UTF-16 units.",
+      "type": "object",
+      "properties": {
+        "end": {
+          "type": "integer",
+          "format": "uint",
+          "minimum": 0
+        },
+        "entity": {
+          "$ref": "#/$defs/EntityType"
+        },
+        "start": {
+          "type": "integer",
+          "format": "uint",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "start",
+        "end",
+        "entity"
+      ]
+    }
+  }
+}

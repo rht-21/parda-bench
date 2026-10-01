@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DriverResponse",
+  "description": "Driver to harness: what the application saw, one observation per turn.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "format": "uint64",
+      "minimum": 0
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Observation"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "observations"
+  ],
+  "$defs": {
+    "Observation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "completed"
+            },
+            "text": {
+              "type": "string"
+            },
+            "tool_calls": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ObservedToolCall"
+              }
+            }
+          },
+          "required": [
+            "kind",
+            "text",
+            "tool_calls"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "http_status": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "uint16",
+              "maximum": 65535,
+              "minimum": 0
+            },
+            "kind": {
+              "type": "string",
+              "const": "errored"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "message"
+          ]
+        }
+      ]
+    },
+    "ObservedToolCall": {
+      "type": "object",
+      "properties": {
+        "arguments": {
+          "description": "Raw JSON string exactly as the client library surfaced it.",
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "arguments"
+      ]
+    }
+  }
+}

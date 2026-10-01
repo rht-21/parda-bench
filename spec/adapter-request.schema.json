@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AdapterRequest",
+  "description": "Harness to tool worker. Text offsets in replies follow the `Span` convention (Unicode scalar values).",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "format": "uint64",
+      "minimum": 0
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "const": "hello"
+        }
+      },
+      "required": [
+        "op"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "const": "detect"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "text"
+      ]
+    },
+    {
+      "description": "Mask `text`, remembering placeholders under `session` for later unmasking.",
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "const": "mask"
+        },
+        "session": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "session",
+        "text"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "const": "unmask"
+        },
+        "session": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "session",
+        "text"
+      ]
+    },
+    {
+      "description": "Feed one streamed chunk; `is_final` tells the tool to flush anything it held back.",
+      "type": "object",
+      "properties": {
+        "chunk": {
+          "type": "string"
+        },
+        "is_final": {
+          "type": "boolean"
+        },
+        "op": {
+          "type": "string",
+          "const": "unmask_stream"
+        },
+        "session": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "session",
+        "chunk",
+        "is_final"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "op": {
+          "type": "string",
+          "const": "shutdown"
+        }
+      },
+      "required": [
+        "op"
+      ]
+    }
+  ],
+  "required": [
+    "id"
+  ]
+}
