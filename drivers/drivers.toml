@@ -1,0 +1,18 @@
+# Out-of-process drivers. `raw_http` is built into the harness and not listed here.
+# Commands run with this directory as working directory.
+
+[drivers.openai_sdk]
+command = ["uv", "run", "--quiet", "--frozen", "--project", "python", "python", "-m", "parda_drivers.openai_sdk"]
+apis = ["openai_chat"]
+
+[drivers.anthropic_sdk]
+command = ["uv", "run", "--quiet", "--frozen", "--project", "python", "python", "-m", "parda_drivers.anthropic_sdk"]
+apis = ["anthropic_messages"]
+
+[drivers.langchain]
+command = ["uv", "run", "--quiet", "--frozen", "--project", "python", "python", "-m", "parda_drivers.langchain"]
+apis = ["openai_chat", "anthropic_messages"]
+
+[drivers.litellm]
+command = ["uv", "run", "--quiet", "--frozen", "--project", "python", "python", "-m", "parda_drivers.litellm"]
+apis = ["openai_chat", "anthropic_messages"]
