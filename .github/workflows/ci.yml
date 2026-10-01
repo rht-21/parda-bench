@@ -1,0 +1,54 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup show
+      - uses: Swatinem/rust-cache@v2
+      # The restore integration tests start the in-repo reference tools with `uv run`.
+      - uses: astral-sh/setup-uv@v6
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - run: cargo test --workspace
+      - name: Schema drift
+        run: cargo run -q -p parda-cli -- schema && git diff --exit-code spec/
+      - name: Dataset drift
+        # Fails if the generator now renders different samples under an already published version.
+        run: |
+          cargo run -q -p parda-cli -- data build
+          cargo run -q -p parda-cli -- data validate data/v0.1.0
+          git diff --exit-code data/
+
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m unittest discover -s sdk/python/tests
+      - run: python -m unittest discover -s tools/regex-baseline/tests
+      - run: python -m unittest discover -s tools/regex-proxy/tests
+
+  node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node --test
+        working-directory: sdk/node
+
+  deny:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EmbarkStudios/cargo-deny-action@v2
