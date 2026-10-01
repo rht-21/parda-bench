@@ -9,11 +9,11 @@ jobs:
   rust:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: rustup show
       - uses: Swatinem/rust-cache@v2
       # The restore integration tests start the in-repo reference tools with `uv run`.
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v10.2.0
       - run: cargo fmt --all -- --check
       - run: cargo clippy --workspace --all-targets -- -D warnings
       - run: cargo test --workspace
@@ -29,19 +29,27 @@ jobs:
   python:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: python -m unittest discover -s sdk/python/tests
       - run: python -m unittest discover -s tools/regex-baseline/tests
       - run: python -m unittest discover -s tools/regex-proxy/tests
+      - uses: astral-sh/setup-uv@v10.2.0
+      - name: Type check
+        # Presidio is left out: its environment pulls a 400 MB spaCy model.
+        run: |
+          (cd sdk/python && uvx mypy --strict src tests)
+          for project in tools/regex-baseline tools/regex-proxy drivers/python; do
+            (cd "$project" && uv run --frozen --with mypy mypy --strict .)
+          done
 
   node:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
       - run: node --test
@@ -50,5 +58,5 @@ jobs:
   deny:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: EmbarkStudios/cargo-deny-action@v2
