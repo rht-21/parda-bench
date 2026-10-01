@@ -9,14 +9,28 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
 from langchain_openai import ChatOpenAI
+from pydantic import SecretStr
 
 from parda_drivers.protocol import Completed, ToolCall, openai_tools, serve
 
 
+API_KEY = "parda-bench"
+TIMEOUT = 60
+
+
 def model_for(request: dict[str, Any]) -> BaseChatModel:
     if request["api"] == "openai_chat":
-        return ChatOpenAI(base_url=request["base_url"], api_key="parda-bench", model=request["model"], max_retries=0)
-    return ChatAnthropic(base_url=request["base_url"], api_key="parda-bench", model=request["model"], max_retries=0)
+        return ChatOpenAI(
+            base_url=request["base_url"], api_key=SecretStr(API_KEY), model=request["model"], max_retries=0, timeout=TIMEOUT
+        )
+    return ChatAnthropic(
+        base_url=request["base_url"],
+        api_key=SecretStr(API_KEY),
+        model_name=request["model"],
+        max_retries=0,
+        timeout=TIMEOUT,
+        stop=None,
+    )
 
 
 def text_of(message: BaseMessage) -> str:

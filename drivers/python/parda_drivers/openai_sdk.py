@@ -14,7 +14,8 @@ def run_turn(request: dict[str, Any], history: list[Any], turn: dict[str, Any]) 
     history.append(openai_input(turn))
     extra: dict[str, Any] = {"tools": openai_tools(request)} if request["tools"] else {}
     if request["stream"]:
-        text, calls = "", {}
+        text = ""
+        calls: dict[int, ToolCall] = {}
         for chunk in client.chat.completions.create(
             model=request["model"], messages=history, stream=True, **extra
         ):

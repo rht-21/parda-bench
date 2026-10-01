@@ -8,11 +8,12 @@ sys.path.insert(0, str(root))
 sys.path.insert(0, str(root.parent / "regex-baseline"))
 
 import proxy  # noqa: E402
+from regex_baseline.vault import Vault  # noqa: E402
 
 
 class ProxyTest(unittest.TestCase):
     def setUp(self) -> None:
-        proxy.vault = proxy.Vault()
+        proxy.vault = Vault()
 
     def test_masks_message_text_but_not_protocol_fields(self) -> None:
         body = {"model": "m", "messages": [{"role": "user", "content": "PAN ABCPS1234K"}]}

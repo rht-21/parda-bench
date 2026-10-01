@@ -24,7 +24,8 @@ def run_turn(request: dict[str, Any], history: list[Any], turn: dict[str, Any]) 
     if request["tools"]:
         args["tools"] = openai_tools(request)
     if request["stream"]:
-        text, calls = "", {}
+        text = ""
+        calls: dict[int, ToolCall] = {}
         for chunk in litellm.completion(stream=True, **args):
             delta = chunk.choices[0].delta
             text += delta.content or ""

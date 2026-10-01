@@ -2,6 +2,7 @@ import io
 import json
 import sys
 import unittest
+from typing import Any
 
 sys.path.insert(0, __file__.rsplit("/tests/", 1)[0] + "/src")
 
@@ -18,7 +19,7 @@ class Upper(Adapter):
         return [Entity(0, len(text), "WORD", 0.5)]
 
 
-def exchange(adapter: Adapter, *requests: dict[str, object]) -> list[dict[str, object]]:
+def exchange(adapter: Adapter, *requests: dict[str, Any]) -> list[dict[str, Any]]:
     stdin = io.StringIO("".join(json.dumps(r) + "\n" for r in requests))
     stdout = io.StringIO()
     run(adapter, stdin, stdout)
