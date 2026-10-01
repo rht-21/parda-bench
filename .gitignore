@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+node_modules/
+.DS_Store
+# Run outputs and generated reports stay local; share reports as files.
+/results/
+/reports/

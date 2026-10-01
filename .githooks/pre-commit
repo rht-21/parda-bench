@@ -1,0 +1,7 @@
+#!/bin/sh
+# Mirrors CI's format and lint checks so they never fail after a push. Enable with:
+#   git config core.hooksPath .githooks
+if ! uv run --quiet ruff format --check src tests >/dev/null 2>&1 || ! uv run --quiet ruff check src tests >/dev/null 2>&1; then
+    echo "pre-commit: code is not formatted or has lint errors. Run 'uv run ruff format src tests' and 'uv run ruff check --fix src tests', then stage and commit again." >&2
+    exit 1
+fi
