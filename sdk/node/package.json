@@ -1,0 +1,10 @@
+{
+  "name": "parda-sdk",
+  "version": "0.1.0",
+  "description": "Helpers for writing Parda Bench tool adapters in Node.js",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "index.mjs",
+  "engines": { "node": ">=18" },
+  "scripts": { "test": "node --test" }
+}
