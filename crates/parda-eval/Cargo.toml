@@ -1,0 +1,15 @@
+[package]
+name = "parda-eval"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+parda-spec.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true
