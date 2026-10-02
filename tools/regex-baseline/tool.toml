@@ -5,7 +5,7 @@ version = "0.1.0"
 commit = "in-repo"
 license = "Apache-2.0"
 language = "python"
-homepage = "https://github.com/rohit-vt/parda-bench"
+homepage = "https://github.com/rht-21/parda-bench"
 capabilities = ["detect", "mask", "unmask", "unmask_stream"]
 transport = { kind = "stdio", command = ["uv", "run", "--quiet", "--frozen", "python", "-m", "regex_baseline"] }
 
