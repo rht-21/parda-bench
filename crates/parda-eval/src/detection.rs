@@ -327,7 +327,11 @@ mod tests {
         );
         assert_eq!(
             r.by_source[&Source::Handwritten][&MatchMode::Strict],
-            Counts { tp: 1, fp: 1, fn_: 0 }
+            Counts {
+                tp: 1,
+                fp: 1,
+                fn_: 0
+            }
         );
         let latency = r.latency.unwrap();
         assert_eq!((latency.tool_ns.p50, latency.wall_ns.max), (200, 310));
