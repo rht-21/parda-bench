@@ -10,8 +10,8 @@ use parda_spec::scenario::{InputSegment, Mangle, ReplySegment};
 
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum AlignError {
-    #[error("literal {literal:?} not found where expected in the masked text {masked:?}")]
-    LiteralNotFound { literal: String, masked: String },
+    #[error("the masked text does not contain the script's literal text in order: {masked:?}")]
+    Unaligned { masked: String },
     #[error(
         "slots {first} and {second} are adjacent with no literal text between them, so they cannot be told apart"
     )]
@@ -23,74 +23,93 @@ pub enum AlignError {
 /// One slot occurrence and the text the tool put in its place.
 pub type SlotText = (usize, String);
 
+/// An input as a leading literal, then each slot with the literal that follows it (empty only after the last).
+struct Script<'a> {
+    lead: &'a str,
+    slots: Vec<(usize, &'a str)>,
+}
+
 /// Splits `masked` into the scenario's literals and per-slot replacements, in input order.
 ///
-/// A slot's text runs to the next occurrence of the following literal, except that a value which reached the
-/// upstream unmasked is taken whole even when it contains that literal (`2345 6789 0124` before `" "`).
+/// A slot's text runs to an occurrence of the following literal such that the rest of the input still matches;
+/// the earliest such occurrence wins. A value that reached the upstream unmasked is preferred whole, even when
+/// it contains that literal (`2345 6789 0124` before `" "`).
 ///
 /// # Errors
-/// Fails if a literal cannot be found in order, two slots are adjacent, or a slot's replacement is empty.
+/// Fails if the literals cannot be matched in order, two slots are adjacent, or a slot's replacement is empty.
 pub fn align(
     segments: &[InputSegment],
     masked: &str,
     pii: &[String],
 ) -> Result<Vec<SlotText>, AlignError> {
-    let mut found = Vec::new();
-    let mut rest = masked;
-    let mut pending_slot: Option<usize> = None;
+    let script = script(segments)?;
+    let found = masked
+        .strip_prefix(script.lead)
+        .and_then(|rest| search(&script.slots, rest, pii))
+        .ok_or_else(|| AlignError::Unaligned {
+            masked: masked.to_owned(),
+        })?;
+    match found.iter().find(|(_, text)| text.is_empty()) {
+        Some((slot, _)) => Err(AlignError::EmptyPlaceholder { slot: *slot }),
+        None => Ok(found),
+    }
+}
+
+fn script(segments: &[InputSegment]) -> Result<Script<'_>, AlignError> {
+    let mut lead = "";
+    let mut slots: Vec<(usize, &str)> = Vec::new();
     for segment in segments {
         match segment {
             InputSegment::Literal { text } if text.is_empty() => {}
-            InputSegment::Literal { text } => {
-                let not_found = || AlignError::LiteralNotFound {
-                    literal: text.clone(),
-                    masked: masked.to_owned(),
-                };
-                match pending_slot.take() {
-                    Some(slot) => {
-                        let unmasked = pii.get(slot).filter(|v| {
-                            rest.strip_prefix(v.as_str())
-                                .is_some_and(|after| after.starts_with(text.as_str()))
-                        });
-                        let at = match unmasked {
-                            Some(value) => value.len(),
-                            None => rest.find(text.as_str()).ok_or_else(not_found)?,
-                        };
-                        found.push(non_empty(slot, &rest[..at])?);
-                        rest = &rest[at + text.len()..];
-                    }
-                    None => rest = rest.strip_prefix(text.as_str()).ok_or_else(not_found)?,
-                }
-            }
+            InputSegment::Literal { text } => match slots.last_mut() {
+                Some((_, following)) => *following = text,
+                None => lead = text,
+            },
             InputSegment::Slot { slot } => {
-                if let Some(first) = pending_slot.replace(*slot) {
+                if let Some((first, "")) = slots.last() {
                     return Err(AlignError::AdjacentSlots {
-                        first,
+                        first: *first,
                         second: *slot,
                     });
                 }
+                slots.push((*slot, ""));
             }
         }
     }
-    match pending_slot {
-        Some(slot) => found.push(non_empty(slot, rest)?),
-        None if !rest.is_empty() => {
-            return Err(AlignError::LiteralNotFound {
-                literal: "<end of text>".to_owned(),
-                masked: masked.to_owned(),
-            });
-        }
-        None => {}
-    }
-    Ok(found)
+    Ok(Script { lead, slots })
 }
 
-fn non_empty(slot: usize, text: &str) -> Result<SlotText, AlignError> {
-    if text.is_empty() {
-        Err(AlignError::EmptyPlaceholder { slot })
-    } else {
-        Ok((slot, text.to_owned()))
+/// Matches `rest` against the remaining slots, backtracking over where each slot's text ends.
+fn search(slots: &[(usize, &str)], rest: &str, pii: &[String]) -> Option<Vec<SlotText>> {
+    match slots {
+        [] => rest.is_empty().then(Vec::new),
+        [(slot, "")] => Some(vec![(*slot, rest.to_owned())]),
+        [(slot, literal), tail @ ..] => split_points(rest, literal, pii.get(*slot))
+            .into_iter()
+            .find_map(|at| {
+                let mut found = search(tail, &rest[at + literal.len()..], pii)?;
+                found.insert(0, (*slot, rest[..at].to_owned()));
+                Some(found)
+            }),
     }
+}
+
+/// Where a slot's text may end: the unmasked value first, then every occurrence of `literal`, empty text last.
+fn split_points(rest: &str, literal: &str, unmasked: Option<&String>) -> Vec<usize> {
+    let whole_value = unmasked
+        .filter(|v| {
+            rest.strip_prefix(v.as_str())
+                .is_some_and(|after| after.starts_with(literal))
+        })
+        .map(String::len);
+    let occurrences =
+        (1..rest.len()).filter(|&i| rest.is_char_boundary(i) && rest[i..].starts_with(literal));
+    let empty = rest.starts_with(literal).then_some(0);
+    whole_value
+        .into_iter()
+        .chain(occurrences)
+        .chain(empty)
+        .collect()
 }
 
 /// The real text of an input: literals with slots replaced by their values.
@@ -251,7 +270,7 @@ mod tests {
     #[test]
     fn altered_literal_fails() {
         let err = align(&[lit("My PAN "), slot(0)], "my PAN X", &[]).unwrap_err();
-        assert!(matches!(err, AlignError::LiteralNotFound { .. }));
+        assert!(matches!(err, AlignError::Unaligned { .. }));
     }
 
     #[test]
@@ -286,6 +305,26 @@ mod tests {
         assert_eq!(got, vec![(0, pii[0].clone()), (1, pii[1].clone())]);
         let masked = align(&segs, "IDs: [AADHAAR_1] [PAN_1]", &pii).unwrap();
         assert_eq!(masked[0], (0, "[AADHAAR_1]".to_owned()));
+    }
+
+    #[test]
+    fn placeholder_containing_the_next_literal_backtracks_to_a_later_match() {
+        let segs = [lit("My email is "), slot(0), lit(".")];
+        let got = align(&segs, "My email is blair@example.com.", &[]).unwrap();
+        assert_eq!(got, vec![(0, "blair@example.com".to_owned())]);
+    }
+
+    #[test]
+    fn backtracking_keeps_later_literals_in_place() {
+        let segs = [lit("Name: "), slot(0), lit(", email "), slot(1), lit(".")];
+        let got = align(&segs, "Name: Rhonda Smith, email r.smith@example.org.", &[]).unwrap();
+        assert_eq!(
+            got,
+            vec![
+                (0, "Rhonda Smith".to_owned()),
+                (1, "r.smith@example.org".to_owned())
+            ]
+        );
     }
 
     #[test]
