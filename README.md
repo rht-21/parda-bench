@@ -297,4 +297,7 @@ Run `git config core.hooksPath .githooks` once after cloning. A pre-commit hook 
 
 ## License
 
-Code: Apache-2.0 (see `LICENSE`). Dataset: CC BY 4.0 (to be confirmed before release).
+- **Code:** Apache-2.0 (see `LICENSE`).
+- **Dataset:** the samples in `data/` and the template and free-form text in `crates/parda-data/templates/` are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) (see `data/LICENSE`). You may use, change and share them, including commercially, as long as you give credit:
+
+  > Parda Bench dataset © 2026 Rohit Mishra, licensed under CC BY 4.0. https://github.com/rht-21/parda-bench
