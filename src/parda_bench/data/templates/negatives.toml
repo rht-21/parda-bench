@@ -1,0 +1,109 @@
+# Hard negatives: one decoy that resembles an entity but is not personal data. A tool should flag nothing.
+
+[[template]]
+id = "neg-order-01"
+lang = "en"
+difficulty = "medium"
+text = "Your order {decoy_aadhaar:spaced} has been shipped and will arrive in 3-5 days."
+
+[[template]]
+id = "neg-order-02"
+lang = "en"
+difficulty = "hard"
+text = "Tracking ID {decoy_aadhaar:plain}: the courier attempted delivery today."
+
+[[template]]
+id = "neg-order-03"
+lang = "hi-Latn"
+difficulty = "hard"
+text = "Order number {decoy_aadhaar:spaced} ka status check karo please."
+
+[[template]]
+id = "neg-invoice-01"
+lang = "en"
+difficulty = "medium"
+text = "Invoice no. {decoy_card:spaced} is due for payment by the end of this month."
+
+[[template]]
+id = "neg-invoice-02"
+lang = "en"
+difficulty = "hard"
+text = "Reference number {decoy_card:plain} has been generated for your complaint."
+
+[[template]]
+id = "neg-sku-01"
+lang = "en"
+difficulty = "medium"
+text = "Model {decoy_pan} is out of stock; the replacement part ships next week."
+
+[[template]]
+id = "neg-sku-02"
+lang = "en"
+difficulty = "hard"
+text = "Please quote batch code {decoy_pan} when reporting a defect."
+
+[[template]]
+id = "neg-pnr-01"
+lang = "en"
+difficulty = "medium"
+text = "PNR {decoy_pnr}: your train is running 40 minutes late."
+
+[[template]]
+id = "neg-pnr-02"
+lang = "hi-Latn"
+difficulty = "hard"
+text = "PNR {decoy_pnr} confirm ho gaya, coach B2 hai."
+
+[[template]]
+id = "neg-pnr-03"
+lang = "hi-Deva"
+difficulty = "hard"
+text = "पीएनआर {decoy_pnr} की स्थिति: कन्फर्म।"
+
+[[template]]
+id = "neg-date-01"
+lang = "en"
+difficulty = "medium"
+text = "The board meeting is scheduled for {decoy_date:long}."
+
+[[template]]
+id = "neg-date-02"
+lang = "en"
+difficulty = "hard"
+text = "Policy start date: {decoy_date:slashed}. Renew before expiry to keep the no-claim bonus."
+
+[[template]]
+id = "neg-date-03"
+lang = "hi-Latn"
+difficulty = "hard"
+text = "Exam {decoy_date:hyphen} ko hai, admit card download kar lo."
+
+[[template]]
+id = "neg-place-01"
+lang = "en"
+difficulty = "medium"
+text = "Meet me near {decoy_place} at 6 pm."
+
+[[template]]
+id = "neg-place-02"
+lang = "en"
+difficulty = "hard"
+text = "The conference will be held at {decoy_place} this year."
+
+[[template]]
+id = "neg-place-03"
+lang = "hi-Latn"
+difficulty = "hard"
+text = "{decoy_place} ke paas traffic bahut hai aaj."
+
+[[template]]
+id = "neg-passport-01"
+lang = "en"
+difficulty = "hard"
+text = "Your booking reference is {decoy_passport}; show it at the hotel desk."
+
+[[template]]
+id = "neg-passport-02"
+lang = "en"
+difficulty = "hard"
+text = "Seat confirmation code {decoy_passport}: keep this email for check-in."

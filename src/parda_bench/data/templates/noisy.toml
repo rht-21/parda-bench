@@ -1,0 +1,58 @@
+# Noisy templates: the text around entities is damaged at render time (OCR confusions, lost spaces, dropped
+# punctuation), and the wording uses the misspellings and abbreviations people actually type.
+
+[[template]]
+id = "noisy-ocr-01"
+lang = "en"
+difficulty = "hard"
+noisy = true
+text = "GOVERNMENT OF INDIA Name: {name:upper} DOB: {dob:slashed} Aadhaar No: {aadhaar:spaced} VID: {vid:spaced}"
+
+[[template]]
+id = "noisy-ocr-02"
+lang = "en"
+difficulty = "hard"
+noisy = true
+text = "INCOME TAX DEPARTMENT Permanent Account Number {pan} Name {name:upper} Date of Birth {dob:slashed}"
+
+[[template]]
+id = "noisy-ocr-03"
+lang = "en"
+difficulty = "hard"
+noisy = true
+text = "TAX INVOICE Seller GSTIN: {gstin} Buyer: {name} Address: {address:latin} Mob: {phone:plain}"
+
+[[template]]
+id = "noisy-chat-01"
+lang = "en"
+difficulty = "hard"
+noisy = true
+text = "pls update my adhaar {aadhaar:plain} n pan no {pan:lower} in ur records asap"
+
+[[template]]
+id = "noisy-chat-02"
+lang = "hi-Latn"
+difficulty = "hard"
+noisy = true
+text = "bhai mera aadhar no {aadhaar:spaced} h aur mob no {phone:plain}, kyc pending dikha rha h"
+
+[[template]]
+id = "noisy-chat-03"
+lang = "hi-Latn"
+difficulty = "hard"
+noisy = true
+text = "a/c holder {name} ifsc {ifsc:lower} upi {upi} pe bhejo paise, gpay nhi chal rha"
+
+[[template]]
+id = "noisy-chat-04"
+lang = "en"
+difficulty = "hard"
+noisy = true
+text = "ph no {phone:zero} email id {email:title} dob {dob:hyphen} plz confirm booking"
+
+[[template]]
+id = "noisy-form-01"
+lang = "mixed"
+difficulty = "hard"
+noisy = true
+text = "नाम / Name: {name:deva} पिता का नाम: {other_name:deva} मोबाइल: {phone:split} वाहन सं.: {vehicle:hyphen}"

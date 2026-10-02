@@ -1,0 +1,83 @@
+# Hindi (Devanagari) templates. Names, addresses and dates default to Devanagari here.
+
+[[template]]
+id = "hd-kyc-01"
+lang = "hi-Deva"
+difficulty = "easy"
+text = "मेरा नाम {name} है और मेरा आधार नंबर {aadhaar:spaced} है।"
+
+[[template]]
+id = "hd-kyc-02"
+lang = "hi-Deva"
+difficulty = "easy"
+text = "मेरा पैन नंबर {pan} है, कृपया केवाईसी अपडेट करें।"
+
+[[template]]
+id = "hd-address-01"
+lang = "hi-Deva"
+difficulty = "medium"
+text = "कृपया पार्सल इस पते पर भेजें: {address}। संपर्क: {phone:intl}"
+
+[[template]]
+id = "hd-phone-01"
+lang = "hi-Deva"
+difficulty = "easy"
+text = "मेरा मोबाइल नंबर {phone} है, कृपया इस पर कॉल करें।"
+
+[[template]]
+id = "hd-dob-01"
+lang = "hi-Deva"
+difficulty = "easy"
+text = "{name} का जन्म {dob} को हुआ था।"
+
+[[template]]
+id = "hd-bank-01"
+lang = "hi-Deva"
+difficulty = "medium"
+text = "खाताधारक {name}, आईएफ़एससी कोड {ifsc}, यूपीआई आईडी {upi:name}।"
+
+[[template]]
+id = "hd-form-01"
+lang = "hi-Deva"
+difficulty = "medium"
+text = '''आवेदक का नाम: {name}
+पिता का नाम: {other_name}
+जन्म तिथि: {dob}
+आधार संख्या: {aadhaar:spaced}
+पता: {address}'''
+
+[[template]]
+id = "hd-email-01"
+lang = "hi-Deva"
+difficulty = "easy"
+text = "कृपया रिपोर्ट {email} पर भेज दें।"
+
+[[template]]
+id = "hd-vehicle-01"
+lang = "hi-Deva"
+difficulty = "medium"
+text = "वाहन संख्या {vehicle:spaced} का चालान {name} के नाम पर जारी हुआ है।"
+
+[[template]]
+id = "hd-travel-01"
+lang = "hi-Deva"
+difficulty = "medium"
+text = "पासपोर्ट संख्या {passport} और मतदाता पहचान पत्र {voter} की प्रति संलग्न है।"
+
+[[template]]
+id = "hd-card-01"
+lang = "hi-Deva"
+difficulty = "hard"
+text = "मेरे कार्ड नंबर {card:spaced} से दो बार पैसे कट गए हैं, {name:deva_first} को वापस करें।"
+
+[[template]]
+id = "hd-gst-01"
+lang = "hi-Deva"
+difficulty = "medium"
+text = "हमारा जीएसटीआईएन {gstin} है।"
+
+[[template]]
+id = "hd-empty-01"
+lang = "hi-Deva"
+difficulty = "easy"
+text = "कल सुबह दस बजे बैठक होगी, सभी समय पर पहुँचें।"

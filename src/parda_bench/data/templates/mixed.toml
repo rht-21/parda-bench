@@ -1,0 +1,49 @@
+# Code-mixed templates: Devanagari and Latin script in one text.
+
+[[template]]
+id = "mx-01"
+lang = "mixed"
+difficulty = "medium"
+text = "Mera Aadhaar {aadhaar:spaced} है और PAN {pan} है।"
+
+[[template]]
+id = "mx-02"
+lang = "mixed"
+difficulty = "medium"
+text = "{name:deva} का phone number {phone:intl} है, please call कर लेना।"
+
+[[template]]
+id = "mx-03"
+lang = "mixed"
+difficulty = "hard"
+text = "UPI ID {upi} पे payment कर दो, और receipt {email} पे भेजना।"
+
+[[template]]
+id = "mx-04"
+lang = "mixed"
+difficulty = "medium"
+text = "Delivery address: {address:deva}, contact {name:full} ({phone:split})"
+
+[[template]]
+id = "mx-05"
+lang = "mixed"
+difficulty = "hard"
+text = "card {card:hyphen} block करवाना है, DOB {dob:slashed} है मेरी।"
+
+[[template]]
+id = "mx-06"
+lang = "mixed"
+difficulty = "medium"
+text = "Gaadi {vehicle:hyphen} की RC {name:deva} के नाम पर है।"
+
+[[template]]
+id = "mx-07"
+lang = "mixed"
+difficulty = "medium"
+text = "Passport no. {passport}, जन्म तिथि {dob:deva}"
+
+[[template]]
+id = "mx-08"
+lang = "mixed"
+difficulty = "hard"
+text = "GST {gstin:lower} वाला bill चाहिए, IFSC {ifsc} में refund करो।"
