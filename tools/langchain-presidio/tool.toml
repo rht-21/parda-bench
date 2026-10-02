@@ -1,0 +1,14 @@
+# LangChain's reversible Presidio anonymizer (langchain-experimental) with its defaults: Presidio's analyzer
+# and fake-value operators. It has no detect or streaming API, so only the non-streaming restore scenarios apply.
+name = "langchain-presidio"
+version = "0.4.2"
+commit = "langchain-experimental==0.4.2"
+license = "MIT"
+language = "python"
+homepage = "https://python.langchain.com/docs/guides/productionization/safety/presidio_data_anonymization/reversible/"
+capabilities = ["mask", "unmask"]
+transport = { kind = "stdio", command = ["uv", "run", "--quiet", "--frozen", "python", "adapter.py"] }
+
+[entity_map]
+
+[configs.default]

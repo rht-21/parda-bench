@@ -10,6 +10,8 @@ Many teams put a masking layer in front of an LLM. It replaces values like Aadha
 The result is a report in Markdown and HTML that compares tools side by side.
 
 > Results describe this dataset and these scenarios only. They are not a verdict on overall tool quality and not a compliance certification.
+>
+> The dataset is synthetic: texts are generated from templates or written by an LLM. The Hindi, Hinglish and mixed-script texts have not yet been reviewed by native speakers, and there are no human-written samples yet.
 
 ## Do I need to know Rust?
 
@@ -19,7 +21,7 @@ No. The `parda-bench` command is written in Rust, but you only build and run it.
 
 | You want to… | Go to |
 |---|---|
-| See how existing tools compare (Presidio, the built-in baselines) | [Try it in 5 minutes](#try-it-in-5-minutes) |
+| See how existing tools compare (Presidio, LangChain's reversible anonymizer, the built-in baselines) | [Try it in 5 minutes](#try-it-in-5-minutes) |
 | Benchmark **your own** masking library or service | [Test your own tool](#test-your-own-tool) |
 | Test a masking **proxy** your app sends OpenAI or Anthropic traffic through | [Proxies](#a-proxy-openai-or-anthropic-compatible) |
 | Check masking used inside a **LangChain** (or LiteLLM) app | [LangChain and other frameworks](#langchain-and-other-frameworks) |
@@ -71,6 +73,17 @@ The report shows:
 - how often each tool flagged the look-alikes
 - a pass/fail matrix for every restore scenario
 - the reason for each failure
+
+## Tools included
+
+| Tool | What it is | Detection | Restore suite |
+|---|---|---|---|
+| `tools/regex-baseline` | Reference: regular expressions and check digits, no ML | Yes | Library: mask, unmask, streaming |
+| `tools/regex-proxy` | Reference: the same engine as an OpenAI/Anthropic-compatible proxy | No | Proxy, through every driver |
+| `tools/presidio` | Microsoft Presidio with its default analyzer | Yes | Not applicable: it redacts but cannot restore |
+| `tools/langchain-presidio` | LangChain's `PresidioReversibleAnonymizer` (`langchain-experimental`), used as a chain would | No: it has no detection API | Library: mask, unmask; no streaming |
+
+With its default settings, `langchain-presidio` swaps values for realistic fakes, for example "Rahul Sharma" becomes "Jonathan Johnson", rather than placeholder tokens. Aadhaar, PAN and Devanagari names pass through unmasked.
 
 ## Test your own tool
 
@@ -233,25 +246,10 @@ There are two different ways LangChain (or LiteLLM, or the OpenAI and Anthropic 
 
 **1. Your app uses LangChain, and masking happens in a proxy.** Use `--driver langchain`. Parda Bench then sends every scenario through a real LangChain `ChatOpenAI` or `ChatAnthropic`, including tool calling and streaming, exactly as your app would. Compare it with `--driver raw_http` to see whether a failure comes from the proxy or from how the client library handles it. Run `pb restore --control --driver langchain` to check the client library on its own, with no tool in between.
 
-**2. Masking happens inside your LangChain chain**, for example with LangChain's `PresidioReversibleAnonymizer` or your own runnable that masks before the model call. Wrap the same masking object in a Python adapter, as above. The harness calls `mask` before the model and `unmask` after it, which is what your chain does. A sketch (not included in this repo, and not yet tested):
+**2. Masking happens inside your LangChain chain**, for example with LangChain's `PresidioReversibleAnonymizer` or your own runnable that masks before the model call. Wrap the same masking object in a Python adapter, as above. The harness calls `mask` before the model and `unmask` after it, which is what your chain does. `tools/langchain-presidio` is a working example built on `PresidioReversibleAnonymizer`:
 
-```python
-from langchain_experimental.data_anonymizer import PresidioReversibleAnonymizer
-from parda_sdk import Adapter, run
-
-class LangChainPresidio(Adapter):
-    tool_version = "langchain-experimental"
-
-    def __init__(self) -> None:
-        self.sessions: dict[str, PresidioReversibleAnonymizer] = {}
-
-    def mask(self, session: str, text: str) -> str:
-        return self.sessions.setdefault(session, PresidioReversibleAnonymizer()).anonymize(text)
-
-    def unmask(self, session: str, text: str) -> str:
-        return self.sessions[session].deanonymize(text)
-
-run(LangChainPresidio())
+```sh
+pb restore --tool tools/langchain-presidio
 ```
 
 Available drivers: `raw_http` (built in), `openai_sdk`, `anthropic_sdk`, `langchain` and `litellm`, listed in `drivers/drivers.toml`. To add another framework, see [docs/restore-suite.md](docs/restore-suite.md#drivers).
