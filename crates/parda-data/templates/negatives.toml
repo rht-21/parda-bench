@@ -107,3 +107,51 @@ id = "neg-passport-02"
 lang = "en"
 difficulty = "hard"
 text = "Seat confirmation code {decoy_passport}: keep this email for check-in."
+
+[[template]]
+id = "neg-gstin-01"
+lang = "en"
+difficulty = "hard"
+text = "Container {decoy_gstin} cleared customs at Nhava Sheva this morning."
+
+[[template]]
+id = "neg-gstin-02"
+lang = "hi-Latn"
+difficulty = "hard"
+text = "Batch code {decoy_gstin} wala stock wapas bhejna hai, packing kharab hai."
+
+[[template]]
+id = "neg-ifsc-01"
+lang = "en"
+difficulty = "hard"
+text = "Apply coupon {decoy_ifsc} at checkout for 10% off on your first order."
+
+[[template]]
+id = "neg-ifsc-02"
+lang = "en"
+difficulty = "medium"
+text = "Replacement part {decoy_ifsc} fits all 2019 and later models."
+
+[[template]]
+id = "neg-handle-01"
+lang = "en"
+difficulty = "medium"
+text = "Loved the food! Follow {decoy_handle} on Instagram for more reviews."
+
+[[template]]
+id = "neg-handle-02"
+lang = "hi-Latn"
+difficulty = "hard"
+text = "Yeh reel {decoy_handle} ne banayi thi, kaafi viral ho gayi."
+
+[[template]]
+id = "neg-service-account-01"
+lang = "en"
+difficulty = "hard"
+text = "Cron job failed: permission denied for {decoy_service_account} while rotating logs."
+
+[[template]]
+id = "neg-service-account-02"
+lang = "en"
+difficulty = "hard"
+text = "SSH as {decoy_service_account} and restart the queue worker."

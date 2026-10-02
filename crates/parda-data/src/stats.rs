@@ -3,7 +3,7 @@
 use std::collections::BTreeMap;
 
 use parda_spec::entity::EntityType;
-use parda_spec::sample::{Difficulty, Labels, Lang, Sample};
+use parda_spec::sample::{Difficulty, Labels, Lang, Sample, Source};
 use serde::Serialize;
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize)]
@@ -17,6 +17,7 @@ pub struct Stats {
     pub hard_negatives_by_decoy: BTreeMap<EntityType, usize>,
     pub by_lang: BTreeMap<Lang, usize>,
     pub by_difficulty: BTreeMap<Difficulty, usize>,
+    pub by_source: BTreeMap<Source, usize>,
 }
 
 impl Stats {
@@ -29,6 +30,7 @@ impl Stats {
         for sample in samples {
             *stats.by_lang.entry(sample.lang).or_default() += 1;
             *stats.by_difficulty.entry(sample.difficulty).or_default() += 1;
+            *stats.by_source.entry(sample.source).or_default() += 1;
             match &sample.labels {
                 Labels::Positive { spans } => {
                     stats.positive_samples += 1;

@@ -46,6 +46,20 @@ pub fn gstin(rng: &mut DataRng, case: Case) -> String {
     case.apply(&format!("{first14}{check}"))
 }
 
+/// GSTIN-shaped code whose check character is wrong, for hard negatives.
+#[must_use]
+pub fn invalid_gstin(rng: &mut DataRng) -> String {
+    let valid = gstin(rng, Case::Upper);
+    let (first14, check) = valid.split_at(14);
+    let wrong = loop {
+        let candidate = char::from(pick(rng, b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
+        if !check.starts_with(candidate) {
+            break candidate;
+        }
+    };
+    format!("{first14}{wrong}")
+}
+
 #[must_use]
 pub fn is_valid_pan(text: &str) -> bool {
     let t = text.to_ascii_uppercase();
@@ -124,6 +138,15 @@ mod tests {
         for _ in 0..200 {
             let g = gstin(&mut rng, Case::Upper);
             assert!(is_valid_gstin(&g), "{g}");
+        }
+    }
+
+    #[test]
+    fn invalid_gstin_never_validates() {
+        let mut rng = DataRng::seed_from_u64(5);
+        for _ in 0..300 {
+            let g = invalid_gstin(&mut rng);
+            assert!(!is_valid_gstin(&g), "{g}");
         }
     }
 

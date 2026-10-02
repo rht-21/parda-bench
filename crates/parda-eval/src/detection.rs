@@ -4,7 +4,7 @@ use std::collections::{BTreeMap, HashMap, HashSet};
 
 use parda_spec::entity::EntityType;
 use parda_spec::record::{DetectionRecord, DetectionResult, PredictedEntity, PredictedSpan};
-use parda_spec::sample::{Difficulty, Labels, Lang, Sample, Span};
+use parda_spec::sample::{Difficulty, Labels, Lang, Sample, Source, Span};
 use serde::Serialize;
 
 use crate::latency::Percentiles;
@@ -71,6 +71,7 @@ pub struct DetectionReport {
     pub scores: BTreeMap<MatchMode, Scores>,
     pub by_lang: BTreeMap<Lang, BTreeMap<MatchMode, Counts>>,
     pub by_difficulty: BTreeMap<Difficulty, BTreeMap<MatchMode, Counts>>,
+    pub by_source: BTreeMap<Source, BTreeMap<MatchMode, Counts>>,
     pub hard_negatives: BTreeMap<EntityType, NegativeCounts>,
     pub unmapped: BTreeMap<String, UnmappedCounts>,
     pub latency: Option<LatencySummary>,
@@ -106,6 +107,7 @@ struct Accumulator {
     scores: BTreeMap<MatchMode, Scores>,
     by_lang: BTreeMap<Lang, BTreeMap<MatchMode, Counts>>,
     by_difficulty: BTreeMap<Difficulty, BTreeMap<MatchMode, Counts>>,
+    by_source: BTreeMap<Source, BTreeMap<MatchMode, Counts>>,
     hard_negatives: BTreeMap<EntityType, NegativeCounts>,
     unmapped: BTreeMap<String, UnmappedCounts>,
     tool_ns: Vec<u64>,
@@ -155,18 +157,9 @@ impl Accumulator {
                 a
             });
             self.scores.entry(mode).or_default().add(&per_entity);
-            self.by_lang
-                .entry(sample.lang)
-                .or_default()
-                .entry(mode)
-                .or_default()
-                .add(total);
-            self.by_difficulty
-                .entry(sample.difficulty)
-                .or_default()
-                .entry(mode)
-                .or_default()
-                .add(total);
+            add_to_slice(&mut self.by_lang, sample.lang, mode, total);
+            add_to_slice(&mut self.by_difficulty, sample.difficulty, mode, total);
+            add_to_slice(&mut self.by_source, sample.source, mode, total);
         }
     }
 
@@ -181,11 +174,26 @@ impl Accumulator {
             scores: self.scores,
             by_lang: self.by_lang,
             by_difficulty: self.by_difficulty,
+            by_source: self.by_source,
             hard_negatives: self.hard_negatives,
             unmapped: self.unmapped,
             latency,
         }
     }
+}
+
+fn add_to_slice<K: Ord>(
+    slices: &mut BTreeMap<K, BTreeMap<MatchMode, Counts>>,
+    key: K,
+    mode: MatchMode,
+    counts: Counts,
+) {
+    slices
+        .entry(key)
+        .or_default()
+        .entry(mode)
+        .or_default()
+        .add(counts);
 }
 
 /// Mapped predictions as gold-comparable spans, and the unmapped predictions as they are.
@@ -207,8 +215,6 @@ fn split_mapped(predicted: &[PredictedSpan]) -> (Vec<Span>, Vec<(&str, &Predicte
 
 #[cfg(test)]
 mod tests {
-    use parda_spec::sample::Source;
-
     use super::*;
 
     fn sample(id: &str, labels: Labels, lang: Lang) -> Sample {
@@ -318,6 +324,10 @@ mod tests {
                 fp: 1,
                 fn_: 0
             }
+        );
+        assert_eq!(
+            r.by_source[&Source::Handwritten][&MatchMode::Strict],
+            Counts { tp: 1, fp: 1, fn_: 0 }
         );
         let latency = r.latency.unwrap();
         assert_eq!((latency.tool_ns.p50, latency.wall_ns.max), (200, 310));

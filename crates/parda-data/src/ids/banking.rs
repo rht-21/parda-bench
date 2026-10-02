@@ -1,6 +1,6 @@
 use rand::RngExt;
 
-use super::{Case, digits_to_string, is_upper_alpha, pick, random_digits};
+use super::{Case, digits_to_string, is_upper_alpha, pick, random_digits, random_letters};
 use crate::DataRng;
 
 const BANK_CODES: [&str; 15] = [
@@ -29,6 +29,21 @@ pub fn ifsc(rng: &mut DataRng, case: Case) -> String {
         "{bank}0{}",
         digits_to_string(&random_digits(rng, 6))
     ))
+}
+
+/// IFSC-shaped code (4 letters, `0`, 6 characters) whose prefix is no bank's, for hard negatives.
+#[must_use]
+pub fn ifsc_like_code(rng: &mut DataRng) -> String {
+    let prefix = loop {
+        let candidate = random_letters(rng, 4);
+        if !BANK_CODES.contains(&candidate.as_str()) {
+            break candidate;
+        }
+    };
+    let tail: String = (0..6)
+        .map(|_| char::from(pick(rng, b"ABCDEFGHJKLMNPQRSTUVWXYZ0123456789")))
+        .collect();
+    format!("{prefix}0{tail}")
 }
 
 /// UPI ID `local@handle`; `local` is a name-derived or mobile-number user part.
@@ -101,6 +116,16 @@ mod tests {
             let local = upi_local_from_name(&mut rng, "Joseph", "D'Souza");
             let u = upi(&mut rng, &local);
             assert!(is_valid_upi(&u), "{u}");
+        }
+    }
+
+    #[test]
+    fn ifsc_like_code_never_uses_a_bank_prefix() {
+        let mut rng = DataRng::seed_from_u64(3);
+        for _ in 0..200 {
+            let code = ifsc_like_code(&mut rng);
+            assert!(is_valid_ifsc(&code), "{code}");
+            assert!(!BANK_CODES.contains(&&code[..4]), "{code}");
         }
     }
 

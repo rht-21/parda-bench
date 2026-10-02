@@ -23,7 +23,7 @@ jobs:
         # Fails if the generator now renders different samples under an already published version.
         run: |
           cargo run -q -p parda-cli -- data build
-          cargo run -q -p parda-cli -- data validate data/v0.1.0
+          for version in data/v*; do cargo run -q -p parda-cli -- data validate "$version"; done
           git diff --exit-code data/
 
   python:

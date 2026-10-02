@@ -1,8 +1,9 @@
 //! Template parsing. A template is text with `{kind}` or `{kind:style}` fillers; `{{` and `}}` are literal braces.
-//! A template holds either only real-entity fillers, or exactly one `decoy_*` filler (a hard negative).
+//! `{=ENTITY:text}` is a hand-labeled span and `{!ENTITY:text}` a literal decoy, for free-form samples.
+//! A template holds either only real entities, or exactly one decoy (a hard negative).
 
 use parda_spec::entity::EntityType;
-use parda_spec::sample::{Difficulty, Lang};
+use parda_spec::sample::{Difficulty, Lang, Source};
 use serde::Deserialize;
 
 use crate::ids::Case;
@@ -77,6 +78,14 @@ pub enum Decoy {
     NamedPlace,
     /// Booking reference shaped like a passport number.
     Passport,
+    /// GSTIN-shaped code with a failing check character.
+    Gstin,
+    /// IFSC-shaped product or coupon code.
+    Ifsc,
+    /// Social-media handle, `@` plus a username, which has no payment provider after it.
+    Handle,
+    /// Machine or service account like `root@localhost`, which belongs to no person.
+    ServiceAccount,
 }
 
 impl Filler {
@@ -113,6 +122,10 @@ impl Decoy {
             Self::Date(_) => EntityType::DateOfBirth,
             Self::NamedPlace => EntityType::PersonName,
             Self::Passport => EntityType::Passport,
+            Self::Gstin => EntityType::Gstin,
+            Self::Ifsc => EntityType::Ifsc,
+            Self::Handle => EntityType::UpiId,
+            Self::ServiceAccount => EntityType::Email,
         }
     }
 }
@@ -122,6 +135,16 @@ pub enum Part {
     Text(String),
     Fill(Filler),
     Decoy(Decoy),
+    /// Fixed text labeled as `entity`.
+    Labeled {
+        entity: EntityType,
+        text: String,
+    },
+    /// Fixed text that resembles `entity` but is not personal data.
+    LiteralDecoy {
+        entity: EntityType,
+        text: String,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -129,16 +152,21 @@ pub struct Template {
     pub id: String,
     pub lang: Lang,
     pub difficulty: Difficulty,
+    /// `template` entries are rendered many times; any other source is one fixed text, rendered once.
+    pub source: Source,
+    /// Damage the text around entities (see `noise`).
+    pub noisy: bool,
     pub parts: Vec<Part>,
 }
 
 impl Template {
-    /// The decoy of a hard-negative template, `None` for a positive one.
+    /// The entity type a hard negative imitates, `None` for a positive template.
     #[must_use]
-    pub fn decoy(&self) -> Option<Decoy> {
+    pub fn decoy_entity(&self) -> Option<EntityType> {
         self.parts.iter().find_map(|p| match p {
-            Part::Decoy(d) => Some(*d),
-            Part::Text(_) | Part::Fill(_) => None,
+            Part::Decoy(d) => Some(d.entity()),
+            Part::LiteralDecoy { entity, .. } => Some(*entity),
+            Part::Text(_) | Part::Fill(_) | Part::Labeled { .. } => None,
         })
     }
 }
@@ -146,7 +174,13 @@ impl Template {
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct TemplateFile {
+    #[serde(default = "template_source")]
+    source: Source,
     template: Vec<TemplateDef>,
+}
+
+fn template_source() -> Source {
+    Source::Template
 }
 
 #[derive(Debug, Deserialize)]
@@ -155,6 +189,8 @@ struct TemplateDef {
     id: String,
     lang: Lang,
     difficulty: Difficulty,
+    #[serde(default)]
+    noisy: bool,
     text: String,
 }
 
@@ -167,17 +203,27 @@ pub fn parse_file(source: &str) -> Result<Vec<Template>, TemplateError> {
         id: "<file>".to_owned(),
         message: e.to_string(),
     })?;
-    file.template.into_iter().map(parse_def).collect()
+    let source = file.source;
+    file.template
+        .into_iter()
+        .map(|def| parse_def(def, source))
+        .collect()
 }
 
-fn parse_def(def: TemplateDef) -> Result<Template, TemplateError> {
+fn parse_def(def: TemplateDef, source: Source) -> Result<Template, TemplateError> {
     let err = |message: String| TemplateError {
         id: def.id.clone(),
         message,
     };
     let parts = parse_text(&def.text).map_err(err)?;
-    let decoys = parts.iter().filter(|p| matches!(p, Part::Decoy(_))).count();
-    let fills = parts.iter().filter(|p| matches!(p, Part::Fill(_))).count();
+    let decoys = parts
+        .iter()
+        .filter(|p| matches!(p, Part::Decoy(_) | Part::LiteralDecoy { .. }))
+        .count();
+    let fills = parts
+        .iter()
+        .filter(|p| matches!(p, Part::Fill(_) | Part::Labeled { .. }))
+        .count();
     if decoys > 1 || (decoys == 1 && fills > 0) {
         return Err(err(
             "a hard negative holds exactly one decoy and no other fillers".to_owned(),
@@ -187,6 +233,8 @@ fn parse_def(def: TemplateDef) -> Result<Template, TemplateError> {
         id: def.id,
         lang: def.lang,
         difficulty: def.difficulty,
+        source,
+        noisy: def.noisy,
         parts,
     })
 }
@@ -230,6 +278,14 @@ fn parse_text(text: &str) -> Result<Vec<Part>, String> {
 }
 
 fn parse_slot(spec: &str) -> Result<Part, String> {
+    if let Some(labeled) = spec.strip_prefix('=') {
+        let (entity, text) = literal_span(labeled)?;
+        return Ok(Part::Labeled { entity, text });
+    }
+    if let Some(decoy) = spec.strip_prefix('!') {
+        let (entity, text) = literal_span(decoy)?;
+        return Ok(Part::LiteralDecoy { entity, text });
+    }
     let (kind, style) = match spec.split_once(':') {
         Some((k, s)) => (k, Some(s)),
         None => (spec, None),
@@ -258,10 +314,29 @@ fn parse_slot(spec: &str) -> Result<Part, String> {
         ("decoy_pnr", None) => Part::Decoy(Decoy::Pnr),
         ("decoy_place", None) => Part::Decoy(Decoy::NamedPlace),
         ("decoy_passport", None) => Part::Decoy(Decoy::Passport),
+        ("decoy_gstin", None) => Part::Decoy(Decoy::Gstin),
+        ("decoy_ifsc", None) => Part::Decoy(Decoy::Ifsc),
+        ("decoy_handle", None) => Part::Decoy(Decoy::Handle),
+        ("decoy_service_account", None) => Part::Decoy(Decoy::ServiceAccount),
         (_, Some(s)) => return Err(format!("unknown filler `{kind}` or style `{s}`")),
         (_, None) => return Err(format!("unknown filler `{kind}`")),
     };
     Ok(part)
+}
+
+/// `ENTITY:text` with `ENTITY` a wire name such as `PERSON_NAME`.
+fn literal_span(spec: &str) -> Result<(EntityType, String), String> {
+    let (name, text) = spec
+        .split_once(':')
+        .ok_or_else(|| format!("`{spec}` should be ENTITY:text"))?;
+    let entity = serde_json::from_value(serde_json::Value::String(name.to_owned()))
+        .map_err(|_| format!("unknown entity type `{name}`"))?;
+    if text.is_empty() || text.trim() != text {
+        return Err(format!(
+            "labeled text `{text}` is empty or padded with spaces"
+        ));
+    }
+    Ok((entity, text.to_owned()))
 }
 
 fn styled<T>(
@@ -397,6 +472,35 @@ mod tests {
     #[test]
     fn hard_negative_reports_its_decoy() {
         let t = one("Your PNR is {decoy_pnr}.").unwrap();
-        assert_eq!(t.decoy(), Some(Decoy::Pnr));
+        assert_eq!(t.decoy_entity(), Some(EntityType::Phone));
+    }
+
+    #[test]
+    fn parses_labeled_span_and_literal_decoy() {
+        let t = one("Ask {=PERSON_NAME:Rahul} at {aadhaar}").unwrap();
+        assert_eq!(
+            t.parts[1],
+            Part::Labeled {
+                entity: EntityType::PersonName,
+                text: "Rahul".to_owned()
+            }
+        );
+        let n = one("Follow {!UPI_ID:@chai.point} for offers").unwrap();
+        assert_eq!(n.decoy_entity(), Some(EntityType::UpiId));
+    }
+
+    #[test]
+    fn rejects_bad_labeled_spans() {
+        assert!(one("{=NAME:Rahul}").is_err());
+        assert!(one("{=PERSON_NAME: Rahul}").is_err());
+        assert!(one("{=PERSON_NAME}").is_err());
+        assert!(one("{!PHONE:12951} and {=PERSON_NAME:Rahul}").is_err());
+    }
+
+    #[test]
+    fn file_source_and_noise_flag_are_read() {
+        let src = "source = \"llm\"\n[[template]]\nid = \"f\"\nlang = \"en\"\ndifficulty = \"hard\"\nnoisy = true\ntext = \"hi\"\n";
+        let t = parse_file(src).unwrap().remove(0);
+        assert_eq!((t.source, t.noisy), (Source::Llm, true));
     }
 }

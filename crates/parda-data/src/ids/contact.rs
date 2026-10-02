@@ -92,6 +92,32 @@ pub fn email(rng: &mut DataRng, first: &str, last: &str, case: EmailCase) -> Str
     format!("{local}@{}", pick(rng, &EMAIL_DOMAINS))
 }
 
+/// Machine and service accounts: email-shaped, but they belong to no person and have no domain.
+const SERVICE_ACCOUNTS: [&str; 6] = [
+    "root@localhost",
+    "admin@localhost",
+    "postgres@db-primary",
+    "deploy@build-agent-3",
+    "jenkins@ci-runner",
+    "noreply@localhost",
+];
+
+/// Social-media handle such as `@rahul.sharma_92`, for hard negatives against UPI IDs.
+#[must_use]
+pub fn social_handle(rng: &mut DataRng, first: &str, last: &str) -> String {
+    let (f, l) = (ascii_lower(first), ascii_lower(last));
+    match rng.random_range(0..3) {
+        0 => format!("@{f}.{l}"),
+        1 => format!("@{f}_{l}{}", rng.random_range(10..100)),
+        _ => format!("@the{f}{l}"),
+    }
+}
+
+#[must_use]
+pub fn service_account(rng: &mut DataRng) -> String {
+    pick(rng, &SERVICE_ACCOUNTS).to_owned()
+}
+
 #[must_use]
 pub fn is_valid_phone(text: &str) -> bool {
     let t = ungrouped(text);
@@ -146,6 +172,25 @@ mod tests {
     #[test]
     fn landline_style_number_is_not_a_mobile() {
         assert!(!is_valid_phone("2234567890"));
+    }
+
+    #[test]
+    fn service_accounts_are_not_valid_emails() {
+        for account in SERVICE_ACCOUNTS {
+            assert!(!is_valid_email(account), "{account}");
+        }
+    }
+
+    #[test]
+    fn handle_has_no_payment_provider() {
+        let mut rng = DataRng::seed_from_u64(4);
+        for _ in 0..50 {
+            let h = social_handle(&mut rng, "Ananya", "Iyer");
+            assert!(
+                h.starts_with('@') && !crate::ids::banking::is_valid_upi(&h),
+                "{h}"
+            );
+        }
     }
 
     #[test]

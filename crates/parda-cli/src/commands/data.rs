@@ -18,7 +18,7 @@ pub struct BuildArgs {
     #[arg(long, default_value_t = 25)]
     per_template: usize,
     /// Dataset version; the dataset is written to `<out>/<version>/`.
-    #[arg(long, default_value = concat!("v", env!("CARGO_PKG_VERSION")))]
+    #[arg(long, default_value = parda_data::DATASET_VERSION)]
     version: String,
     #[arg(long, default_value = "data")]
     out: PathBuf,

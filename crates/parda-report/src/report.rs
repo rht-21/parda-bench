@@ -160,6 +160,11 @@ fn detection_detail(doc: &mut Doc, run: &ScoredDetection<'_>) {
         "Difficulty",
         r.by_difficulty.iter().map(|(k, v)| (enum_name(k), v)),
     );
+    slice_table(
+        doc,
+        "Source",
+        r.by_source.iter().map(|(k, v)| (enum_name(k), v)),
+    );
     if !r.hard_negatives.is_empty() {
         let rows = r
             .hard_negatives

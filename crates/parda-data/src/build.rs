@@ -1,5 +1,5 @@
 //! Seeded dataset build: every sample's RNG is derived from (seed, template id, index), so adding or editing one
-//! template never changes the samples of another.
+//! template never changes the samples of another. Free-form entries (any source but `template`) render once.
 
 use std::collections::BTreeSet;
 
@@ -11,7 +11,7 @@ use crate::render::render;
 use crate::template::{Template, TemplateError, parse_file};
 use crate::{DataRng, GENERATOR_VERSION};
 
-const BUILTIN_TEMPLATE_FILES: [(&str, &str); 5] = [
+const BUILTIN_TEMPLATE_FILES: [(&str, &str); 11] = [
     ("en.toml", include_str!("../templates/en.toml")),
     ("hi_latn.toml", include_str!("../templates/hi_latn.toml")),
     ("hi_deva.toml", include_str!("../templates/hi_deva.toml")),
@@ -19,6 +19,27 @@ const BUILTIN_TEMPLATE_FILES: [(&str, &str); 5] = [
     (
         "negatives.toml",
         include_str!("../templates/negatives.toml"),
+    ),
+    ("noisy.toml", include_str!("../templates/noisy.toml")),
+    (
+        "freeform/en.toml",
+        include_str!("../templates/freeform/en.toml"),
+    ),
+    (
+        "freeform/hi_latn.toml",
+        include_str!("../templates/freeform/hi_latn.toml"),
+    ),
+    (
+        "freeform/hi_deva.toml",
+        include_str!("../templates/freeform/hi_deva.toml"),
+    ),
+    (
+        "freeform/mixed.toml",
+        include_str!("../templates/freeform/mixed.toml"),
+    ),
+    (
+        "freeform/negatives.toml",
+        include_str!("../templates/freeform/negatives.toml"),
     ),
 ];
 
@@ -44,20 +65,28 @@ pub fn builtin_templates() -> Result<Vec<Template>, TemplateError> {
     Ok(all)
 }
 
-/// Renders `per_template` samples from each template, deterministically for a given `seed`.
+/// Renders `per_template` samples from each template and one from each free-form entry, deterministically for a
+/// given `seed`.
 #[must_use]
 pub fn build(templates: &[Template], seed: u64, per_template: usize) -> Vec<Sample> {
     templates
         .iter()
-        .flat_map(|t| (0..per_template).map(move |n| sample(t, seed, n)))
+        .flat_map(|t| {
+            let count = if t.source == Source::Template {
+                per_template
+            } else {
+                1
+            };
+            (0..count).map(move |n| sample(t, seed, n))
+        })
         .collect()
 }
 
 fn sample(template: &Template, seed: u64, n: usize) -> Sample {
     let mut rng = DataRng::seed_from_u64(sample_seed(seed, &template.id, n));
     let rendered = render(template, &mut rng);
-    let labels = match template.decoy() {
-        Some(d) => Labels::HardNegative { decoy: d.entity() },
+    let labels = match template.decoy_entity() {
+        Some(decoy) => Labels::HardNegative { decoy },
         None => Labels::Positive {
             spans: rendered.spans,
         },
@@ -68,7 +97,7 @@ fn sample(template: &Template, seed: u64, n: usize) -> Sample {
         labels,
         lang: template.lang,
         difficulty: template.difficulty,
-        source: Source::Template,
+        source: template.source,
         generator_version: GENERATOR_VERSION.to_owned(),
     }
 }
@@ -82,6 +111,8 @@ fn sample_seed(seed: u64, template_id: &str, n: usize) -> u64 {
 
 #[cfg(test)]
 mod tests {
+    use parda_spec::entity::EntityType;
+
     use super::*;
 
     fn templates() -> Vec<Template> {
@@ -113,6 +144,36 @@ mod tests {
         let samples = build(&templates(), 42, 5);
         let issues = crate::validate::validate(&samples);
         assert!(issues.is_empty(), "{issues:#?}");
+    }
+
+    #[test]
+    fn free_form_entries_render_once_and_keep_their_source() {
+        let templates = templates();
+        let samples = build(&templates, 1, 3);
+        let free_form = templates
+            .iter()
+            .filter(|t| t.source != Source::Template)
+            .count();
+        let llm: Vec<_> = samples.iter().filter(|s| s.source == Source::Llm).collect();
+        assert!(free_form > 0);
+        assert_eq!(llm.len(), free_form);
+        assert!(llm.iter().all(|s| s.id.ends_with("-0000")));
+    }
+
+    #[test]
+    fn hard_negatives_cover_the_new_decoy_types() {
+        let stats = crate::stats::Stats::of(&build(&templates(), 1, 1));
+        for decoy in [
+            EntityType::Gstin,
+            EntityType::Ifsc,
+            EntityType::UpiId,
+            EntityType::Email,
+        ] {
+            assert!(
+                stats.hard_negatives_by_decoy.contains_key(&decoy),
+                "{decoy:?}"
+            );
+        }
     }
 
     #[test]

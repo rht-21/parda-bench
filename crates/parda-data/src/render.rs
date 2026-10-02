@@ -10,6 +10,7 @@ use crate::ids::{Case, Grouping, aadhaar, banking, card, contact, documents, pic
 use crate::lexicon::{
     BUILDINGS, Bilingual, CITIES, FIRST_NAMES, LANDMARKS, LOCALITIES, NAMED_PLACES, SURNAMES,
 };
+use crate::noise::add_noise;
 use crate::template::{Decoy, Filler, NameStyle, Part, Script, Template, UpiStyle};
 
 const DOB_YEARS: std::ops::RangeInclusive<u16> = 1950..=2006;
@@ -66,16 +67,24 @@ pub fn render(template: &Template, rng: &mut DataRng) -> Rendered {
     let mut spans = Vec::new();
     for part in &template.parts {
         let piece = match part {
-            Part::Text(t) => t.clone(),
+            Part::Text(t) if template.noisy => add_noise(t, rng),
+            Part::Text(t) | Part::Labeled { text: t, .. } | Part::LiteralDecoy { text: t, .. } => {
+                t.clone()
+            }
             Part::Fill(f) => fill(*f, template.lang, &persona, rng),
             Part::Decoy(d) => decoy(*d, rng),
         };
         let len = piece.chars().count();
-        if let Part::Fill(f) = part {
+        let entity = match part {
+            Part::Fill(f) => Some(f.entity()),
+            Part::Labeled { entity, .. } => Some(*entity),
+            Part::Text(_) | Part::Decoy(_) | Part::LiteralDecoy { .. } => None,
+        };
+        if let Some(entity) = entity {
             spans.push(Span {
                 start: chars,
                 end: chars + len,
-                entity: f.entity(),
+                entity,
             });
         }
         chars += len;
@@ -181,6 +190,13 @@ fn decoy(decoy: Decoy, rng: &mut DataRng) -> String {
         }
         Decoy::NamedPlace => pick(rng, &NAMED_PLACES).to_owned(),
         Decoy::Passport => documents::passport(rng),
+        Decoy::Gstin => tax::invalid_gstin(rng),
+        Decoy::Ifsc => banking::ifsc_like_code(rng),
+        Decoy::Handle => {
+            let person = Person::random(rng);
+            contact::social_handle(rng, person.first.latin, person.last.latin)
+        }
+        Decoy::ServiceAccount => contact::service_account(rng),
     }
 }
 
@@ -230,7 +246,7 @@ fn address(rng: &mut DataRng, script: Script) -> String {
 #[cfg(test)]
 mod tests {
     use parda_spec::entity::EntityType;
-    use parda_spec::sample::Difficulty;
+    use parda_spec::sample::{Difficulty, Source};
     use rand::SeedableRng;
 
     use super::*;
@@ -240,6 +256,8 @@ mod tests {
             id: "t".to_owned(),
             lang,
             difficulty: Difficulty::Easy,
+            source: Source::Template,
+            noisy: false,
             parts,
         }
     }
@@ -292,6 +310,32 @@ mod tests {
             r.text
         );
         assert_eq!(r.spans[0].entity, EntityType::PersonName);
+    }
+
+    #[test]
+    fn noise_never_moves_gold_spans() {
+        let mut t = template(
+            vec![
+                Part::Text("Please, Sir: my PAN is ".to_owned()),
+                Part::Fill(Filler::Pan(None)),
+                Part::Text(" and the Original Bill is lost. ".to_owned()),
+                Part::Labeled {
+                    entity: EntityType::PersonName,
+                    text: "Lalita".to_owned(),
+                },
+            ],
+            Lang::En,
+        );
+        t.noisy = true;
+        for seed in 0..100 {
+            let r = render(&t, &mut DataRng::seed_from_u64(seed));
+            assert!(
+                crate::ids::tax::is_valid_pan(&span_text(&r, 0)),
+                "{}",
+                r.text
+            );
+            assert_eq!(span_text(&r, 1), "Lalita");
+        }
     }
 
     #[test]
