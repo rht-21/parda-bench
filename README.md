@@ -293,6 +293,10 @@ Available drivers: `raw_http` (built in), `openai_sdk`, `anthropic_sdk`, `langch
 - [docs/dataset.md](docs/dataset.md): what is in the dataset, its labeling rules and its versions
 - [docs/architecture.md](docs/architecture.md): how the pieces fit together, for contributors
 
+## Contributing
+
+Run `git config core.hooksPath .githooks` once after cloning. A pre-commit hook then blocks commits with unformatted Rust code, the most common reason CI fails.
+
 ## License
 
 Code: Apache-2.0 (see `LICENSE`). Dataset: CC BY 4.0 (to be confirmed before release).
