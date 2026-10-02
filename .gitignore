@@ -3,3 +3,6 @@
 __pycache__/
 node_modules/
 .DS_Store
+# Run outputs and generated reports stay local; share reports as files.
+/results/
+/reports/
