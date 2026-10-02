@@ -17,5 +17,6 @@ pub type DataRng = rand_chacha::ChaCha8Rng;
 /// Version that `data build` writes by default; bump it whenever the generated samples change.
 pub const DATASET_VERSION: &str = "v0.2.0";
 
-/// Recorded in every sample so a dataset can be traced to the code that produced it.
-pub const GENERATOR_VERSION: &str = concat!("parda-data/", env!("CARGO_PKG_VERSION"));
+/// Recorded in every sample so a dataset can be traced to the code that produced it. Pinned rather than taken
+/// from the crate version, so a release that leaves generation unchanged keeps published datasets byte-identical.
+pub const GENERATOR_VERSION: &str = "parda-data/0.1.0";
