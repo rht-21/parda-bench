@@ -1,0 +1,8 @@
+{
+  "version": "v0.2.0",
+  "seed": 42,
+  "per_template": 25,
+  "generator_version": "parda-data/0.2.0",
+  "sample_count": 2925,
+  "samples_sha256": "904de3c941921aebfc79f057d970c6ff517b709da6ecff9325e5c6cb5356af94"
+}
