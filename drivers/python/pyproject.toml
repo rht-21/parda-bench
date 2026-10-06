@@ -1,0 +1,25 @@
+[project]
+name = "parda-drivers"
+version = "0.1.0"
+description = "Parda Bench client-framework drivers: real LLM client stacks run against the mock upstream"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+dependencies = [
+    "anthropic>=0.40",
+    "langchain-anthropic>=0.3",
+    "langchain-core>=0.3",
+    "langchain-openai>=0.3",
+    "litellm>=1.50",
+    "openai>=1.50",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["parda_drivers"]
+
+[tool.mypy]
+strict = true
+ignore_missing_imports = true
