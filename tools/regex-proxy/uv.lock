@@ -1,0 +1,30 @@
+version = 1
+revision = 3
+requires-python = ">=3.10"
+
+[[package]]
+name = "parda-sdk"
+version = "0.1.0"
+source = { editable = "../../sdk/python" }
+
+[[package]]
+name = "regex-baseline"
+version = "0.1.0"
+source = { editable = "../regex-baseline" }
+dependencies = [
+    { name = "parda-sdk" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "parda-sdk", editable = "../../sdk/python" }]
+
+[[package]]
+name = "regex-proxy"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "regex-baseline" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "regex-baseline", editable = "../regex-baseline" }]
