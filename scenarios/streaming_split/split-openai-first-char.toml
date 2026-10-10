@@ -1,0 +1,11 @@
+id = "split-openai-first-char"
+category = "streaming_split"
+description = "Only the placeholder's first character ends a chunk, the hardest point to hold back."
+api = "openai_chat"
+stream = true
+pii = ["+91 98765 43210"]
+checks = ["no_leak_upstream", "restored_exact", "no_placeholder_fragment"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "Call me on " }, { slot = 0 }, { text = " tomorrow." }] }
+reply = { kind = "text", chunks = [[{ text = "We will call " }, { slot = 0, to = 1 }], [{ slot = 0, from = 1 }, { text = " tomorrow." }]] }

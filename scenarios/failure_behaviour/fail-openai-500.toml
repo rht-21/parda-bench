@@ -1,0 +1,11 @@
+id = "fail-openai-500"
+category = "failure_behaviour"
+description = "The upstream fails with 500; the client must see the error, not a made-up answer, and nothing may leak."
+api = "openai_chat"
+stream = false
+pii = ["ABCPS1234K"]
+checks = ["no_leak_upstream", "fails_closed"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "Check PAN " }, { slot = 0 }, { text = "." }] }
+reply = { kind = "http_error", status = 500, body = '{"error": {"message": "upstream overloaded", "type": "server_error"}}' }

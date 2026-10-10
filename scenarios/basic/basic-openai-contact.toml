@@ -1,0 +1,11 @@
+id = "basic-openai-contact"
+category = "basic"
+description = "A name, a mobile number and an email in one message, all echoed back."
+api = "openai_chat"
+stream = false
+pii = ["Ananya Iyer", "+91 98765 43210", "ananya.iyer@gmail.com"]
+checks = ["no_leak_upstream", "restored_exact", "no_placeholder_fragment"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "Name: " }, { slot = 0 }, { text = ", phone " }, { slot = 1 }, { text = ", email " }, { slot = 2 }, { text = "." }] }
+reply = { kind = "text", chunks = [[{ text = "Thanks " }, { slot = 0 }, { text = ". We will call " }, { slot = 1 }, { text = " and write to " }, { slot = 2 }, { text = "." }]] }

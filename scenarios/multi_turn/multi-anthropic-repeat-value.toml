@@ -1,0 +1,15 @@
+id = "multi-anthropic-repeat-value"
+category = "multi_turn"
+description = "The same value is sent again in a later turn and must map to the same placeholder."
+api = "anthropic_messages"
+stream = false
+pii = ["ABCPS1234K"]
+checks = ["no_leak_upstream", "restored_exact", "placeholder_stable_across_turns"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "Link PAN " }, { slot = 0 }, { text = " to my account." }] }
+reply = { kind = "text", chunks = [[{ text = "Done." }]] }
+
+[[turns]]
+input = { kind = "user", message = [{ text = "Is PAN " }, { slot = 0 }, { text = " linked now?" }] }
+reply = { kind = "text", chunks = [[{ text = "Yes, " }, { slot = 0 }, { text = " is linked." }]] }

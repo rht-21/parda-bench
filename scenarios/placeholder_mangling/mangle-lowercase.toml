@@ -1,0 +1,11 @@
+id = "mangle-lowercase"
+category = "placeholder_mangling"
+description = "The model copies the placeholder back altered (lowercase); a robust tool still restores the value."
+api = "openai_chat"
+stream = false
+pii = ["ABCPS1234K"]
+checks = ["restored_exact", "no_placeholder_fragment"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "File my return with PAN " }, { slot = 0 }, { text = "." }] }
+reply = { kind = "text", chunks = [[{ text = "Filing with PAN " }, { slot = 0, mangle = "lowercase" }, { text = " now." }]] }

@@ -1,0 +1,11 @@
+id = "json-openai-record"
+category = "structured_output"
+description = "The model answers with a JSON object containing three placeholders; restored output must stay valid JSON."
+api = "openai_chat"
+stream = false
+pii = ["Ananya Iyer", "ABCPS1234K", "+91 98765 43210"]
+checks = ["no_leak_upstream", "restored_exact", "json_valid"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "Extract as JSON: name " }, { slot = 0 }, { text = ", PAN " }, { slot = 1 }, { text = ", phone " }, { slot = 2 }, { text = "." }] }
+reply = { kind = "text", chunks = [[{ text = '{"name": "' }, { slot = 0 }, { text = '", "pan": "' }, { slot = 1 }, { text = '", "phone": "' }, { slot = 2 }, { text = '"}' }]] }

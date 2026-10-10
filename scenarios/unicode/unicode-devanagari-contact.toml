@@ -1,0 +1,11 @@
+id = "unicode-devanagari-contact"
+category = "unicode"
+description = "A Devanagari name and a phone number inside Hindi text."
+api = "openai_chat"
+stream = false
+pii = ["अनन्या अय्यर", "+91 98765 43210"]
+checks = ["no_leak_upstream", "restored_exact", "no_placeholder_fragment"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "मेरा नाम " }, { slot = 0 }, { text = " है और मेरा फ़ोन " }, { slot = 1 }, { text = " है।" }] }
+reply = { kind = "text", chunks = [[{ text = "नमस्ते " }, { slot = 0 }, { text = ", हम " }, { slot = 1 }, { text = " पर कॉल करेंगे।" }]] }

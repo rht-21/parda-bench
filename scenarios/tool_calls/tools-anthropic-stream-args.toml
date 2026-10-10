@@ -1,0 +1,12 @@
+id = "tools-anthropic-stream-args"
+category = "tool_calls"
+description = "Anthropic input_json_delta events with a placeholder split between them."
+api = "anthropic_messages"
+stream = true
+pii = ["rahul.sharma@okaxis"]
+checks = ["no_leak_upstream", "restored_exact", "json_valid", "no_placeholder_fragment"]
+tools = [{ name = "request_payment", description = "Send a UPI collect request.", parameters = { type = "object", properties = { vpa = { type = "string" } }, required = ["vpa"] } }]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "Collect 500 rupees from " }, { slot = 0 }, { text = "." }] }
+reply = { kind = "tool_call", call_id = "toolu_1", name = "request_payment", argument_chunks = [[{ text = '{"vpa": "' }, { slot = 0, to = 3 }], [{ slot = 0, from = 3 }, { text = '"}' }]] }

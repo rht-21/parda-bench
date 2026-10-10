@@ -1,0 +1,11 @@
+id = "split-anthropic-two-values"
+category = "streaming_split"
+description = "Two placeholders, each split, with the second split starting in the chunk that ends the first."
+api = "anthropic_messages"
+stream = true
+pii = ["ABCPS1234K", "SBIN0001234"]
+checks = ["no_leak_upstream", "restored_exact", "no_placeholder_fragment"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "PAN " }, { slot = 0 }, { text = ", IFSC " }, { slot = 1 }, { text = "." }] }
+reply = { kind = "text", chunks = [[{ text = "PAN " }, { slot = 0, to = 4 }], [{ slot = 0, from = 4 }, { text = " and IFSC " }, { slot = 1, to = 4 }], [{ slot = 1, from = 4 }, { text = " recorded." }]] }

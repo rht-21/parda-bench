@@ -1,0 +1,11 @@
+id = "adjacent-values-space"
+category = "repeats_adjacency"
+description = "Two different identifiers separated by a single space."
+api = "openai_chat"
+stream = false
+pii = ["2345 6789 0124", "ABCPS1234K"]
+checks = ["no_leak_upstream", "restored_exact", "no_placeholder_fragment"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "IDs: " }, { slot = 0 }, { text = " " }, { slot = 1 }] }
+reply = { kind = "text", chunks = [[{ slot = 0 }, { text = " / " }, { slot = 1 }]] }

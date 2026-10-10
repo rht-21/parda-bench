@@ -1,0 +1,11 @@
+id = "split-openai-two-chunks"
+category = "streaming_split"
+description = "A placeholder split across two SSE chunks after its third character."
+api = "openai_chat"
+stream = true
+pii = ["ABCPS1234K"]
+checks = ["no_leak_upstream", "restored_exact", "no_placeholder_fragment"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "My PAN is " }, { slot = 0 }, { text = "." }] }
+reply = { kind = "text", chunks = [[{ text = "Your PAN is " }, { slot = 0, to = 3 }], [{ slot = 0, from = 3 }, { text = "." }]] }

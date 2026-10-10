@@ -1,0 +1,11 @@
+id = "json-anthropic-stream"
+category = "structured_output"
+description = "Streamed JSON with a placeholder split between deltas."
+api = "anthropic_messages"
+stream = true
+pii = ["2345 6789 0124", "ananya.iyer@gmail.com"]
+checks = ["no_leak_upstream", "restored_exact", "json_valid", "no_placeholder_fragment"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "Return JSON for Aadhaar " }, { slot = 0 }, { text = " and email " }, { slot = 1 }, { text = "." }] }
+reply = { kind = "text", chunks = [[{ text = '{"aadhaar": "' }, { slot = 0, to = 6 }], [{ slot = 0, from = 6 }, { text = '", "email": "' }, { slot = 1 }, { text = '"}' }]] }

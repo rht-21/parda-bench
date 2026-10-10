@@ -1,0 +1,11 @@
+id = "repeat-reply-three-times"
+category = "repeats_adjacency"
+description = "The model repeats one placeholder three times with only punctuation between."
+api = "anthropic_messages"
+stream = true
+pii = ["SBIN0001234"]
+checks = ["no_leak_upstream", "restored_exact", "no_placeholder_fragment"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "IFSC " }, { slot = 0 }, { text = "?" }] }
+reply = { kind = "text", chunks = [[{ slot = 0 }, { text = "," }, { slot = 0 }], [{ text = "," }, { slot = 0 }]] }

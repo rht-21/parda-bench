@@ -1,0 +1,15 @@
+id = "multi-openai-new-value"
+category = "multi_turn"
+description = "A second turn adds a new value; the reply uses values from both turns."
+api = "openai_chat"
+stream = true
+pii = ["2345 6789 0124", "+91 98765 43210"]
+checks = ["no_leak_upstream", "restored_exact", "placeholder_stable_across_turns", "no_placeholder_fragment"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "Aadhaar: " }, { slot = 0 }] }
+reply = { kind = "text", chunks = [[{ text = "Got it." }]] }
+
+[[turns]]
+input = { kind = "user", message = [{ text = "And my mobile is " }, { slot = 1 }] }
+reply = { kind = "text", chunks = [[{ text = "Aadhaar " }, { slot = 0 }, { text = " will be linked to " }], [{ slot = 1 }, { text = "." }]] }

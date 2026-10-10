@@ -1,0 +1,15 @@
+id = "multi-openai-recall"
+category = "multi_turn"
+description = "A value given in turn one is recalled by the model in turn two."
+api = "openai_chat"
+stream = false
+pii = ["ananya.iyer@gmail.com"]
+checks = ["no_leak_upstream", "restored_exact", "placeholder_stable_across_turns"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "My email is " }, { slot = 0 }, { text = "." }] }
+reply = { kind = "text", chunks = [[{ text = "Noted." }]] }
+
+[[turns]]
+input = { kind = "user", message = [{ text = "Which email did I give you?" }] }
+reply = { kind = "text", chunks = [[{ text = "You gave " }, { slot = 0 }, { text = "." }]] }

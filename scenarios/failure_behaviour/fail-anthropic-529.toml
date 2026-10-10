@@ -1,0 +1,11 @@
+id = "fail-anthropic-529"
+category = "failure_behaviour"
+description = "The upstream is overloaded (529) during a streamed request."
+api = "anthropic_messages"
+stream = true
+pii = ["2345 6789 0124"]
+checks = ["no_leak_upstream", "fails_closed"]
+
+[[turns]]
+input = { kind = "user", message = [{ text = "Aadhaar " }, { slot = 0 }, { text = " status?" }] }
+reply = { kind = "http_error", status = 529, body = '{"type": "error", "error": {"type": "overloaded_error", "message": "Overloaded"}}' }
